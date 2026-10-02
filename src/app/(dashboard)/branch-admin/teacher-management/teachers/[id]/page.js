@@ -543,7 +543,7 @@ export default function TeacherDetailPage() {
                         <div className="flex justify-between items-start mb-2">
                             <div className="flex items-center gap-2">
                                 <div className="h-6 w-6 rounded bg-blue-100 flex items-center justify-center"><Building className="h-3 w-3 text-blue-600"/></div>
-                                <div><h3 className="text-xs font-bold leading-none">Adamjee Coaching</h3></div>
+                                <div><h3 className="text-xs font-bold leading-none">SCMS Pro</h3></div>
                             </div>
                         </div>
                         <div className="flex gap-3 mt-1">

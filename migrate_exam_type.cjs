@@ -3,7 +3,7 @@ const { Sequelize } = require('sequelize');
 // Make sure dotenv is loaded so process.env.DATABASE_URL is available
 require('dotenv').config({ path: '.env.local' });
 
-const sequelize = new Sequelize(process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/adamjee_db', { logging: false });
+const sequelize = new Sequelize(process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/scms_pro_db', { logging: false });
 
 async function run() {
   try {

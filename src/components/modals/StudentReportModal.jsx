@@ -55,7 +55,7 @@ export default function StudentReportModal({
   const previewRef = useRef(null);
 
   const dynamicBranchInfo = {
-    name: user?.branch?.name || "Adamjee Coaching Center",
+    name: user?.branch?.name || "SCMS Pro Coaching System",
     address: user?.branch?.address
   };
 

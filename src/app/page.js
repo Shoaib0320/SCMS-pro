@@ -47,10 +47,10 @@ const CAMPUSES_DATA = [
     img: ASSETS.CAMPUS_12_IMAGE,
     icon: School,
     color: "from-blue-600 to-indigo-700",
-    whatsapp: "https://wa.me/923002755421?text=Hello%20Adamjee%20Coaching%20Centre%20Campus%2012%2C%20I%20would%20like%20to%20know%20more%20about%20admissions!",
+    whatsapp: "https://wa.me/923002755421?text=Hello%20SCMS Pro%20Coaching%20Centre%20Campus%2012%2C%20I%20would%20like%20to%20know%20more%20about%20admissions!",
     call: "tel:03002755421",
-    facebook: "https://facebook.com/adamjeecoaching",
-    map: "https://www.google.com/maps/place/Adamjee+Coaching+Centre+-+Campus+12/@24.9439253,67.0469434,15z/data=!4m6!3m5!1s0x3eb340807114c837:0x7c1877bc45969bd6!8m2!3d24.9439132!4d67.0469274!16s%2Fg%2F1tcvmrlm!5m1!1e1?entry=ttu&g_ep=EgoyMDI2MDcyNi4wIKXMDSoASAFQAw%3D%3D"
+    facebook: "https://facebook.com/scmspro",
+    map: "https://www.google.com/maps/place/SCMS Pro+Coaching+Centre+-+Campus+12/@24.9439253,67.0469434,15z/data=!4m6!3m5!1s0x3eb340807114c837:0x7c1877bc45969bd6!8m2!3d24.9439132!4d67.0469274!16s%2Fg%2F1tcvmrlm!5m1!1e1?entry=ttu&g_ep=EgoyMDI2MDcyNi4wIKXMDSoASAFQAw%3D%3D"
   },
   { 
     id: "campus-7",
@@ -62,9 +62,9 @@ const CAMPUSES_DATA = [
     img: ASSETS.CAMPUS_7_IMAGE,
     icon: MapPin,
     color: "from-emerald-600 to-teal-700",
-    whatsapp: "https://wa.me/923174725902?text=Hello%20Adamjee%20Coaching%20Centre%20Campus%207%2C%20I%20would%20like%20to%20know%20more%20about%20admissions!",
+    whatsapp: "https://wa.me/923174725902?text=Hello%20SCMS Pro%20Coaching%20Centre%20Campus%207%2C%20I%20would%20like%20to%20know%20more%20about%20admissions!",
     call: "tel:03174725902",
-    facebook: "https://facebook.com/adamjeecoaching",
+    facebook: "https://facebook.com/scmspro",
     map: "https://www.google.com/maps/place/24%C2%B058'23.5%22N+67%C2%B003'57.7%22E/@24.9731953,67.0660247,16.99z/data=!4m4!3m3!8m2!3d24.9731944!4d67.0660278!5m1!1e1?entry=ttu&g_ep=EgoyMDI2MDcyNi4wIKXMDSoASAFQAw%3D%3D"
   },
   { 
@@ -77,10 +77,10 @@ const CAMPUSES_DATA = [
     img: ASSETS.CAMPUS_35_IMAGE,
     icon: MapPin,
     color: "from-amber-500 to-orange-600",
-    whatsapp: "https://wa.me/923158944284?text=Hello%20Adamjee%20Coaching%20Centre%20Campus%2035%2C%20I%20would%20like%20to%20know%20more%20about%20admissions!",
+    whatsapp: "https://wa.me/923158944284?text=Hello%20SCMS Pro%20Coaching%20Centre%20Campus%2035%2C%20I%20would%20like%20to%20know%20more%20about%20admissions!",
     call: "tel:03158944284",
-    facebook: "https://facebook.com/adamjeecoaching",
-    map: "https://www.google.com/maps/place/Adamjee+Coaching+Centre+(Orangi+Campus)/@24.9509513,66.9992516,17z/data=!4m6!3m5!1s0x3eb341397a74ba1f:0x6999e522efb5f021!8m2!3d24.9509465!4d67.0018265!16s%2Fg%2F11mdgspc87!5m1!1e1?entry=ttu&g_ep=EgoyMDI2MDcyNi4wIKXMDSoASAFQAw%3D%3D"
+    facebook: "https://facebook.com/scmspro",
+    map: "https://www.google.com/maps/place/SCMS Pro+Coaching+Centre+(Orangi+Campus)/@24.9509513,66.9992516,17z/data=!4m6!3m5!1s0x3eb341397a74ba1f:0x6999e522efb5f021!8m2!3d24.9509465!4d67.0018265!16s%2Fg%2F11mdgspc87!5m1!1e1?entry=ttu&g_ep=EgoyMDI2MDcyNi4wIKXMDSoASAFQAw%3D%3D"
   },
 ];
 
@@ -245,7 +245,7 @@ export default function Home() {
             </h1>
             
             <p className="text-lg md:text-xl text-slate-600 max-w-2xl leading-relaxed mb-10">
-              For more than 35 years, Adamjee Coaching Centre has been dedicated to empowering students through concept-based learning and academic excellence. Since founded in 1989, we have built a strong reputation for helping students achieve outstanding results in Matric and Intermediate examinations.
+              For more than 35 years, SCMS Pro Coaching System has been dedicated to empowering students through concept-based learning and academic excellence. Since founded in 1989, we have built a strong reputation for helping students achieve outstanding results in Matric and Intermediate examinations.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mb-16">
@@ -290,13 +290,13 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ── ABOUT ADAMJEE COACHING CENTRE ── */}P
+      {/* ── ABOUT SCMS PRO COACHING SYSTEM ── */}P
       <section id="about" className="lp-section lp-about-section">
         <ScrollSection className="lp-about-grid">
           <div className="lp-about-visual px-2 md:px-0">
             <div className="relative">
               <div className="rounded-[2rem] overflow-hidden border-4 md:border-8 border-white shadow-[0_25px_50px_rgba(0,0,0,0.1)]">
-                <img src={ASSETS.DIRECTOR_IMAGE} alt="Adamjee Directors" className="w-full h-[350px] md:h-[550px] object-cover" />
+                <img src={ASSETS.DIRECTOR_IMAGE} alt="SCMS Pro Directors" className="w-full h-[350px] md:h-[550px] object-cover" />
               </div>
               <div className="absolute bottom-4 right-2 md:bottom-12 md:-right-8 bg-[#0f2a5c] text-white rounded-[1.25rem] p-3 md:p-5 text-center shadow-[0_8px_32px_rgba(15,42,92,0.4)]">
                 <span className="block text-xl md:text-3xl font-extrabold leading-none">1989</span>
@@ -306,12 +306,12 @@ export default function Home() {
           </div>
           <div className="lp-about-text">
             <p className="lp-eyebrow">About Us</p>
-            <h2 className="lp-section-heading">Adamjee Coaching<br /><span className="text-[#0f2a5c]">Centre</span></h2>
+            <h2 className="lp-section-heading">SCMS Pro<br /><span className="text-[#0f2a5c]">Centre</span></h2>
             <p className="lp-body-text">
-              Adamjee Coaching Centre is one of Pakistan&apos;s trusted coaching institutions, committed to providing quality education through concept-based learning and academic excellence. Established in 1989 by <strong>Syed Kamran Rasool Qadri</strong> and <strong>Syed Nouman Ahmed</strong>, the institution has played a significant role in shaping the academic future of thousands of students.
+              SCMS Pro Coaching System is one of Pakistan&apos;s trusted coaching institutions, committed to providing quality education through concept-based learning and academic excellence. Established in 1989 by <strong>Syed Kamran Rasool Qadri</strong> and <strong>Syed Nouman Ahmed</strong>, the institution has played a significant role in shaping the academic future of thousands of students.
             </p>
             <p className="lp-body-text mt-4">
-              Over the decades, Adamjee Coaching Centre has expanded into a well-recognized educational network with multiple campuses across Karachi. Our dedicated faculty, disciplined learning environment, and commitment to student success have earned the trust of both students and parents. We believe that education is not simply about preparing students for examinations—it is about developing critical thinking, confidence, discipline, and the ability to succeed in every walk of life.
+              Over the decades, SCMS Pro Coaching System has expanded into a well-recognized educational network with multiple campuses across Karachi. Our dedicated faculty, disciplined learning environment, and commitment to student success have earned the trust of both students and parents. We believe that education is not simply about preparing students for examinations—it is about developing critical thinking, confidence, discipline, and the ability to succeed in every walk of life.
             </p>
             <div className="mt-8 space-y-6">
               <div>
@@ -339,7 +339,7 @@ export default function Home() {
         <ScrollSection>
           <div className="lp-section-header">
             <p className="lp-eyebrow">Why Choose Us</p>
-            <h2 className="lp-section-heading">Why Adamjee<br /><span className="text-[#0f2a5c]">Coaching Centre?</span></h2>
+            <h2 className="lp-section-heading">Why SCMS Pro<br /><span className="text-[#0f2a5c]">Coaching Centre?</span></h2>
             <p className="lp-section-desc">We emphasize conceptual understanding rather than rote memorization, enabling students to develop strong academic foundations and problem-solving skills.</p>
           </div>
           <div className="lp-features-grid">
@@ -362,7 +362,7 @@ export default function Home() {
           <div className="lp-section-header">
             <p className="lp-eyebrow">Our Programs</p>
             <h2 className="lp-section-heading">Academic<br /><span className="text-[#0f2a5c]">Offerings</span></h2>
-            <p className="lp-section-desc">Adamjee Coaching Centre offers comprehensive coaching for Matric, Intermediate, and Entry Test preparation.</p>
+            <p className="lp-section-desc">SCMS Pro Coaching System offers comprehensive coaching for Matric, Intermediate, and Entry Test preparation.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto px-4 items-start">
             {PROGRAMS.map((p) => (
@@ -392,7 +392,7 @@ export default function Home() {
           <div className="lp-section-header">
             <p className="lp-eyebrow">Our Network</p>
             <h2 className="lp-section-heading">Our<br /><span className="text-[#0f2a5c]">Campuses</span></h2>
-            <p className="lp-section-desc">Adamjee Coaching Centre proudly serves students through multiple campuses across Karachi. This website provides information about our following campuses:</p>
+            <p className="lp-section-desc">SCMS Pro Coaching System proudly serves students through multiple campuses across Karachi. This website provides information about our following campuses:</p>
           </div>
           <div className="max-w-6xl mx-auto px-4 grid gap-8 md:grid-cols-3">
             {CAMPUSES_DATA.map((campus) => (
@@ -446,7 +446,7 @@ export default function Home() {
           <div className="lp-section-header">
             <p className="lp-eyebrow">Position Holders</p>
             <h2 className="lp-section-heading">Our Star<br /><span className="text-[#0f2a5c]">Achievers 2025</span></h2>
-            <p className="lp-section-desc">Celebrating the outstanding students who made Adamjee Coaching proud this year.</p>
+            <p className="lp-section-desc">Celebrating the outstanding students who made SCMS Pro proud this year.</p>
           </div>
           <div className="lp-ph-carousel-wrap"
             onMouseEnter={() => setAchieverPaused(true)}
@@ -572,7 +572,7 @@ export default function Home() {
         <ScrollSection>
           <div className="lp-section-header">
             <p className="lp-eyebrow">Admissions & Scholarships</p>
-            <h2 className="lp-section-heading">Join Adamjee<br /><span className="text-[#0f2a5c]">Today</span></h2>
+            <h2 className="lp-section-heading">Join SCMS Pro<br /><span className="text-[#0f2a5c]">Today</span></h2>
             <p className="lp-section-desc">Admissions are now open for the 2026 academic year. Secure your seat today and explore our scholarship opportunities!</p>
           </div>
           <div className="lp-steps-grid">
@@ -632,9 +632,9 @@ export default function Home() {
                   </div>
                   <div className="lp-contact-card-content">
                     <span className="lp-contact-card-label">Campus 12 (North Nazimabad)</span>
-                    <a href="https://www.google.com/maps/search/?api=1&query=Adamjee+Coaching+Center+Campus+12+North+Nazimabad+Karachi" target="_blank" rel="noopener noreferrer" className="lp-contact-card-text mb-1 hover:text-[#0f2a5c] block transition-colors">C-26, Block I, Behind Imam Clinic, 5 Star Chowrangi, Karachi</a>
+                    <a href="https://www.google.com/maps/search/?api=1&query=SCMS Pro+Coaching+Center+Campus+12+North+Nazimabad+Karachi" target="_blank" rel="noopener noreferrer" className="lp-contact-card-text mb-1 hover:text-[#0f2a5c] block transition-colors">C-26, Block I, Behind Imam Clinic, 5 Star Chowrangi, Karachi</a>
                     <a href="https://wa.me/923002755421" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-slate-700 hover:text-green-600 block transition-colors">☎ 0300-2755421 | 021-36633586</a>
-                    <a href="mailto:adamjeecampus12@gmail.com" className="text-sm font-medium text-slate-700 hover:text-blue-600 block transition-colors">adamjeecampus12@gmail.com</a>
+                    <a href="mailto:campus12@scmspro.com" className="text-sm font-medium text-slate-700 hover:text-blue-600 block transition-colors">campus12@scmspro.com</a>
                   </div>
                 </div>
 
@@ -645,9 +645,9 @@ export default function Home() {
                   </div>
                   <div className="lp-contact-card-content">
                     <span className="lp-contact-card-label">Campus 7 (U.P. More)</span>
-                    <a href="https://www.google.com/maps/search/?api=1&query=Adamjee+Coaching+Center+Campus+7+U.P.+More+Karachi" target="_blank" rel="noopener noreferrer" className="lp-contact-card-text mb-1 hover:text-emerald-600 block transition-colors">A-977, Sector 11-B, U.P. More, North Karachi, Karachi</a>
+                    <a href="https://www.google.com/maps/search/?api=1&query=SCMS Pro+Coaching+Center+Campus+7+U.P.+More+Karachi" target="_blank" rel="noopener noreferrer" className="lp-contact-card-text mb-1 hover:text-emerald-600 block transition-colors">A-977, Sector 11-B, U.P. More, North Karachi, Karachi</a>
                     <a href="https://wa.me/923174725902" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-slate-700 hover:text-green-600 block transition-colors">☎ 0317-4725902 | 021-36985445</a>
-                    <a href="mailto:adamjeecampus7@gmail.com" className="text-sm font-medium text-slate-700 hover:text-blue-600 block transition-colors">adamjeecampus7@gmail.com</a>
+                    <a href="mailto:campus7@scmspro.com" className="text-sm font-medium text-slate-700 hover:text-blue-600 block transition-colors">campus7@scmspro.com</a>
                   </div>
                 </div>
 
@@ -658,9 +658,9 @@ export default function Home() {
                   </div>
                   <div className="lp-contact-card-content">
                     <span className="lp-contact-card-label">Campus 35 (Orangi Town)</span>
-                    <a href="https://www.google.com/maps/search/?api=1&query=Adamjee+Coaching+Center+Campus+35+Orangi+Town+Karachi" target="_blank" rel="noopener noreferrer" className="lp-contact-card-text mb-1 hover:text-purple-600 block transition-colors">Opp. Aziz-e-Millat High School, 11-1/2, Orangi Town, Karachi</a>
+                    <a href="https://www.google.com/maps/search/?api=1&query=SCMS Pro+Coaching+Center+Campus+35+Orangi+Town+Karachi" target="_blank" rel="noopener noreferrer" className="lp-contact-card-text mb-1 hover:text-purple-600 block transition-colors">Opp. Aziz-e-Millat High School, 11-1/2, Orangi Town, Karachi</a>
                     <a href="https://wa.me/923158944284" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-slate-700 hover:text-green-600 block transition-colors">☎ 0315-8944284</a>
-                    <a href="mailto:adamjeecampus35@gmail.com" className="text-sm font-medium text-slate-700 hover:text-blue-600 block transition-colors">adamjeecampus35@gmail.com</a>
+                    <a href="mailto:campus35@scmspro.com" className="text-sm font-medium text-slate-700 hover:text-blue-600 block transition-colors">campus35@scmspro.com</a>
                   </div>
                 </div>
 

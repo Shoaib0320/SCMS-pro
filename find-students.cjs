@@ -22,9 +22,9 @@ const Branch = sequelize.define('Branch', {
 
 async function findStudents() {
   try {
-    const admin = await User.findOne({ where: { email: 'adamjeec12@gmail.com' } });
+    const admin = await User.findOne({ where: { email: 'admin@scmspro.com' } });
     if (!admin) {
-      console.log('Admin adamjeec12@gmail.com not found!');
+      console.log('Admin admin@scmspro.com not found!');
       process.exit(1);
     }
     

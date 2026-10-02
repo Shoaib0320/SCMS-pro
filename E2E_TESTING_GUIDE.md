@@ -1,6 +1,6 @@
-# End-to-End (E2E) Testing Guide for Adamjee Coaching
+# End-to-End (E2E) Testing Guide for SCMS Pro
 
-This document outlines the End-to-End (E2E) test suite architecture, safety policies, and execution commands for the Adamjee Coaching Management System.
+This document outlines the End-to-End (E2E) test suite architecture, safety policies, and execution commands for the SCMS Pro Coaching Management System.
 
 ---
 

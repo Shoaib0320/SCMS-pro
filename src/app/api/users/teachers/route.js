@@ -166,10 +166,10 @@ async function createTeacher(req) {
           id: finalRegNo,
           email: normalizedEmail,
           password: finalPassword,
-          branchName: branch?.name || "Adamjee Coaching",
+          branchName: branch?.name || "SCMS Pro",
         });
 
-        await sendEmail(normalizedEmail, "Welcome to Adamjee Coaching - Teacher Portal Access", emailHtml);
+        await sendEmail(normalizedEmail, "Welcome to SCMS Pro - Teacher Portal Access", emailHtml);
       } catch (mailError) {
         console.error("Mail Error:", mailError);
       }

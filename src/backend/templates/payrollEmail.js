@@ -5,7 +5,7 @@
 
 export const getPayrollEmailTemplate = (type, data) => {
   const { teacher, payroll, month, year } = data;
-  const coachingName = 'Adamjee Coaching';
+  const coachingName = 'SCMS Pro';
 
   const baseStyles = `
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

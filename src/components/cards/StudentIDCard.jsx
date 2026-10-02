@@ -1,7 +1,7 @@
 import React from 'react';
 import { User, Phone, MapPin, GraduationCap, Calendar, Mail } from 'lucide-react';
 
-const StudentIDCard = ({ student, qrCodeUrl, coachingLogo = "/adamjee-logo.png" }) => {
+const StudentIDCard = ({ student, qrCodeUrl, coachingLogo = "/logo.png" }) => {
   if (!student) return null;
 
   const studentName = `${student.first_name || ''} ${student.last_name || ''}`.toUpperCase();
@@ -40,7 +40,7 @@ const StudentIDCard = ({ student, qrCodeUrl, coachingLogo = "/adamjee-logo.png" 
         {/* Brand Bar */}
         <div className="mt-auto bg-gradient-to-r from-[#edb42d] to-[#bd7c37] py-4 px-4 text-center border-y-2 border-black">
           <h3 className="text-xl font-black text-white tracking-tighter drop-shadow-sm">
-            ADAMJEE COACHING CENTRE
+            SCMS PRO COACHING SYSTEM
           </h3>
           <p className="text-[10px] font-bold text-white/90 uppercase tracking-widest mt-0.5 drop-shadow-sm">
             The Best in Coaching
@@ -106,8 +106,8 @@ const StudentIDCard = ({ student, qrCodeUrl, coachingLogo = "/adamjee-logo.png" 
           </p>
           
           <div className="mt-6 space-y-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-            <p>Adamjee Coaching Centre - {branchName}</p>
-            <p>www.adamjee.edu.pk</p>
+            <p>SCMS Pro Coaching System - {branchName}</p>
+            <p>www.scmspro.com</p>
           </div>
         </div>
       </div>

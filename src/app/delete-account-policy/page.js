@@ -86,7 +86,7 @@ export default function DeleteAccountPolicy() {
               Account Deletion Policy
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-slate-300">
-              Understanding the process, conditions, and legal parameters regarding the deletion of student, parent, or staff accounts at Adamjee Coaching Center.
+              Understanding the process, conditions, and legal parameters regarding the deletion of student, parent, or staff accounts at SCMS Pro Coaching System.
             </p>
             <div className="mt-8 text-sm text-slate-400">
               <span>Last Updated: May 18, 2026</span>
@@ -152,7 +152,7 @@ export default function DeleteAccountPolicy() {
               </div>
               <div className="mt-6 space-y-4 text-base leading-relaxed text-slate-600">
                 <p>
-                  At <strong>Adamjee Coaching Center</strong>, we value the autonomy of our students, parents, and employees over their digital identities. This Account Deletion Policy outlines your rights regarding account termination and defines the protocols we execute when you choose to close your portal account.
+                  At <strong>SCMS Pro Coaching System</strong>, we value the autonomy of our students, parents, and employees over their digital identities. This Account Deletion Policy outlines your rights regarding account termination and defines the protocols we execute when you choose to close your portal account.
                 </p>
                 <p>
                   Our goal is to ensure a transparent, safe, and legally-compliant deletion mechanism while preserving essential academic archives, financial ledgers, and institutional regulatory data in accordance with local education board compliance requirements.
@@ -230,7 +230,7 @@ export default function DeleteAccountPolicy() {
                     <span className="absolute -left-[9px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#1c2450] text-[8px] text-white">1</span>
                     <h4 className="font-bold text-[#1c2450] text-lg">Pathway A: Direct Campus Admin Request (In-Person)</h4>
                     <p className="text-sm text-slate-600 mt-1">
-                      Parents or students can visit their respective <strong>Adamjee campus branch office</strong> in person and submit a formal account deletion application. The campus administrator will verify the applicant's identity, ensure all financial dues are fully cleared, and submit the deletion request to the core IT division.
+                      Parents or students can visit their respective <strong>SCMS Pro campus branch office</strong> in person and submit a formal account deletion application. The campus administrator will verify the applicant's identity, ensure all financial dues are fully cleared, and submit the deletion request to the core IT division.
                     </p>
                   </div>
 
@@ -264,7 +264,7 @@ export default function DeleteAccountPolicy() {
               </div>
               <div className="mt-6 space-y-4 text-base leading-relaxed text-slate-600">
                 <p>
-                  Please note that <strong>Account Deletion is not completely synonymous with instant data purging</strong>. In compliance with Sindh Board of Education regulatory requirements and auditing policies, Adamjee retains specific files:
+                  Please note that <strong>Account Deletion is not completely synonymous with instant data purging</strong>. In compliance with Sindh Board of Education regulatory requirements and auditing policies, SCMS Pro retains specific files:
                 </p>
                 <div className="mt-6 grid gap-6 sm:grid-cols-2">
                   <div className="border border-slate-100 rounded-2xl bg-slate-50/50 p-5">
@@ -394,7 +394,7 @@ export default function DeleteAccountPolicy() {
                     </span>
                   </summary>
                   <p className="mt-3 text-sm leading-relaxed text-slate-600 pl-1">
-                    No! If you are moving between Adamjee coaching branches, please do not delete your account. Contact the destination branch registrar to issue an official branch transfer ticket. Your history and GR records will migrate automatically.
+                    No! If you are moving between SCMS Pro coaching branches, please do not delete your account. Contact the destination branch registrar to issue an official branch transfer ticket. Your history and GR records will migrate automatically.
                   </p>
                 </details>
               </div>

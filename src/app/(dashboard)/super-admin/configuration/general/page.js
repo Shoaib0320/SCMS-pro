@@ -6,7 +6,7 @@ import { Settings, Save, Building2, Mail, Phone, Globe } from 'lucide-react';
 
 export default function GeneralSettingsPage() {
   const [settings, setSettings] = useState({
-    coachingName: 'Adamjee Coaching',
+    coachingName: 'SCMS Pro',
     email: 'info@easeacademy.com',
     phone: '+92-300-1234567',
     address: 'Main Boulevard, Lahore',

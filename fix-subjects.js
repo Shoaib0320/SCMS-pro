@@ -23,9 +23,9 @@ const Branch = sequelize.define('Branch', {
 async function analyzeAndFix() {
   try {
     // 1. Find Admin
-    const admin = await User.findOne({ where: { email: 'adamjeec35@gmail.com' } });
+    const admin = await User.findOne({ where: { email: 'admin35@scmspro.com' } });
     if (!admin) {
-      console.log('Admin adamjeec35@gmail.com not found!');
+      console.log('Admin admin35@scmspro.com not found!');
       process.exit(1);
     }
     

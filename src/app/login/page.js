@@ -85,12 +85,12 @@ export default function LoginPage() {
             <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-xl border border-gray-100 overflow-hidden">
               <img
                 src="/logo.png"
-                alt="Adamjee Logo"
+                alt="SCMS Pro Logo"
                 className="w-16 h-16 object-contain"
               />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Adamjee Coaching</h1>
+          <h1 className="text-3xl font-bold text-gray-900">SCMS Pro</h1>
           <p className="text-gray-600 mt-2">Coaching Management System</p>
         </div>
 

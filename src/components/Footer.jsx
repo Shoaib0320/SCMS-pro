@@ -32,7 +32,7 @@ export default function Footer() {
               <div className="relative h-12 w-12 overflow-hidden rounded-xl bg-white p-1">
                 <Image
                   src="/logo.png"
-                  alt="Adamjee Coaching logo"
+                  alt="SCMS Pro logo"
                   width={48}
                   height={48}
                   className="object-contain"
@@ -40,7 +40,7 @@ export default function Footer() {
               </div>
               <div>
                 <span className="text-xl font-bold text-white tracking-tight block">
-                  Adamjee Coaching
+                  SCMS Pro
                 </span>
               </div>
             </Link>
@@ -127,21 +127,21 @@ export default function Footer() {
                 <div>
                   <h4 className="text-slate-200 font-medium mb-1">Campus 12 (North Nazimabad)</h4>
                   <a href="https://wa.me/923002755421" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-green-500 transition-colors"><Phone className="h-3.5 w-3.5" /> 0300-2755421</a>
-                  <a href="https://www.google.com/maps/search/?api=1&query=Adamjee+Coaching+Center+Campus+12+North+Nazimabad+Karachi" target="_blank" rel="noopener noreferrer" className="flex items-start gap-2 text-slate-400 mt-1 hover:text-amber-500 transition-colors"><MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5" /> <span>5 Star Chowrangi, Karachi</span></a>
+                  <a href="https://www.google.com/maps/search/?api=1&query=SCMS Pro+Coaching+Center+Campus+12+North+Nazimabad+Karachi" target="_blank" rel="noopener noreferrer" className="flex items-start gap-2 text-slate-400 mt-1 hover:text-amber-500 transition-colors"><MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5" /> <span>5 Star Chowrangi, Karachi</span></a>
                 </div>
 
                 {/* Campus 7 */}
                 <div>
                   <h4 className="text-slate-200 font-medium mb-1">Campus 7 (U.P. More)</h4>
                   <a href="https://wa.me/923174725902" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-green-500 transition-colors"><Phone className="h-3.5 w-3.5" /> 0317-4725902</a>
-                  <a href="https://www.google.com/maps/search/?api=1&query=Adamjee+Coaching+Center+Campus+7+U.P.+More+Karachi" target="_blank" rel="noopener noreferrer" className="flex items-start gap-2 text-slate-400 mt-1 hover:text-amber-500 transition-colors"><MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5" /> <span>Sector 11-B, North Karachi</span></a>
+                  <a href="https://www.google.com/maps/search/?api=1&query=SCMS Pro+Coaching+Center+Campus+7+U.P.+More+Karachi" target="_blank" rel="noopener noreferrer" className="flex items-start gap-2 text-slate-400 mt-1 hover:text-amber-500 transition-colors"><MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5" /> <span>Sector 11-B, North Karachi</span></a>
                 </div>
 
                 {/* Campus 35 */}
                 <div>
                   <h4 className="text-slate-200 font-medium mb-1">Campus 35 (Orangi Town)</h4>
                   <a href="https://wa.me/923158944284" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-green-500 transition-colors"><Phone className="h-3.5 w-3.5" /> 0315-8944284</a>
-                  <a href="https://www.google.com/maps/search/?api=1&query=Adamjee+Coaching+Center+Campus+35+Orangi+Town+Karachi" target="_blank" rel="noopener noreferrer" className="flex items-start gap-2 text-slate-400 mt-1 hover:text-amber-500 transition-colors"><MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5" /> <span>Opp. Aziz-e-Millat High School</span></a>
+                  <a href="https://www.google.com/maps/search/?api=1&query=SCMS Pro+Coaching+Center+Campus+35+Orangi+Town+Karachi" target="_blank" rel="noopener noreferrer" className="flex items-start gap-2 text-slate-400 mt-1 hover:text-amber-500 transition-colors"><MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5" /> <span>Opp. Aziz-e-Millat High School</span></a>
                 </div>
 
               </div>
@@ -153,7 +153,7 @@ export default function Footer() {
         {/* Bottom copyright segment */}
         <div className="mt-12 pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-slate-500 text-center sm:text-left">
-            &copy; {new Date().getFullYear()} Adamjee Coaching Campus 12. All rights reserved.
+            &copy; {new Date().getFullYear()} SCMS Pro Campus 12. All rights reserved.
           </p>
           <div className="flex items-center gap-1.5 text-sm text-slate-500">
             <span>Powered by</span>

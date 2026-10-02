@@ -280,7 +280,7 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
               </div>
               <div className="flex flex-col min-w-0">
                 <h2 className="font-bold text-[15px] tracking-tight text-slate-900 dark:text-white leading-tight truncate">
-                  Adamjee <span className="text-indigo-600">Coaching</span>
+                  SCMS Pro <span className="text-indigo-600">Coaching</span>
                 </h2>
                 <span className="text-[9px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 truncate">Management System</span>
               </div>

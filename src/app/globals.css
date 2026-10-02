@@ -77,19 +77,34 @@
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
 
-  /* Adamjee Coaching Theme Colors */
-  --adamjee-primary: #0f2a5c; /* Deep Navy Blue */
-  --adamjee-secondary: #f59e0b; /* Golden Yellow */
-  --adamjee-accent: #0f2a5c; /* Deep Navy Blue */
-  --adamjee-background: #f8fafc; /* Light Slate */
-  --adamjee-background-secondary: #e2e8f0; /* Slate 200 */
-  --adamjee-foreground: #0f172a; /* Slate 900 */
-  --adamjee-text-light: #ffffff; /* White Text */
-  --adamjee-muted: #64748b; /* Slate 500 */
-  --adamjee-border: #cbd5e1; /* Slate 300 */
-  --adamjee-card: #ffffff; /* White */
-  --adamjee-gradient-start: #0f2a5c; /* Deep Navy Blue */
-  --adamjee-gradient-end: #1e3a8a; /* Dark Blue */
+  /* SCMS Pro Theme Colors */
+  --scms-primary: #0f2a5c; /* Deep Navy Blue */
+  --scms-secondary: #f59e0b; /* Golden Yellow */
+  --scms-accent: #0f2a5c; /* Deep Navy Blue */
+  --scms-background: #f8fafc; /* Light Slate */
+  --scms-background-secondary: #e2e8f0; /* Slate 200 */
+  --scms-foreground: #0f172a; /* Slate 900 */
+  --scms-text-light: #ffffff; /* White Text */
+  --scms-muted: #64748b; /* Slate 500 */
+  --scms-border: #cbd5e1; /* Slate 300 */
+  --scms-card: #ffffff; /* White */
+  --scms-gradient-start: #0f2a5c; /* Deep Navy Blue */
+  --scms-gradient-end: #1e3a8a; /* Dark Blue */
+
+  /* Backward Compatibility Aliases */
+  --adamjee-primary: var(--scms-primary);
+  --adamjee-secondary: var(--scms-secondary);
+  --adamjee-accent: var(--scms-accent);
+  --adamjee-background: var(--scms-background);
+  --adamjee-background-secondary: var(--scms-background-secondary);
+  --adamjee-foreground: var(--scms-foreground);
+  --adamjee-text-light: var(--scms-text-light);
+  --adamjee-muted: var(--scms-muted);
+  --adamjee-border: var(--scms-border);
+  --adamjee-card: var(--scms-card);
+  --adamjee-gradient-start: var(--scms-gradient-start);
+  --adamjee-gradient-end: var(--scms-gradient-end);
+
 }
 
 .dark {

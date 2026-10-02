@@ -3,7 +3,7 @@
  * Returns HTML email body based on template type
  */
 
-export const getStudentEmailTemplate = (type, student, coachingName = 'Adamjee Coaching') => {
+export const getStudentEmailTemplate = (type, student, coachingName = 'SCMS Pro') => {
   const baseStyles = `
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #333;

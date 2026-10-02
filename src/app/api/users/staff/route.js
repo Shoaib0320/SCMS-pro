@@ -138,9 +138,9 @@ async function createStaff(req) {
           id: finalRegNo,
           email: normalizedEmail,
           password: finalPassword,
-          branchName: branch?.name || "Adamjee Coaching",
+          branchName: branch?.name || "SCMS Pro",
         });
-        await sendEmail(normalizedEmail, "Welcome to Adamjee Coaching - Staff Portal", emailHtml);
+        await sendEmail(normalizedEmail, "Welcome to SCMS Pro - Staff Portal", emailHtml);
       } catch (mailErr) {
         console.error("Mail Error:", mailErr);
       }

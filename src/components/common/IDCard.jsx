@@ -116,7 +116,7 @@ const QRCodeDisplay = ({ size = 100, value = '', accentColor = '#cda080', logoUr
     border: `1px solid #f1f5f9`
   }}>
     <QRCodeSVG
-      value={value || 'ADAMJEE'}
+      value={value || 'SCMS PRO'}
       size={size}
       level="H"
       includeMargin={false}
@@ -161,7 +161,7 @@ const StudentIDCard = ({ institute, design, student }) => {
         whiteSpace: 'nowrap',
         textOverflow: 'ellipsis'
       }}>
-        {institute?.name || 'ADAMJEE COACHING CENTRE'}
+        {institute?.name || 'SCMS PRO COACHING SYSTEM'}
       </div>
 
       {/* Photo Section - positioned at 1.4" from left */}
@@ -296,11 +296,11 @@ const IDCardViewer = ({ studentData = {}, institute: instituteProp = null, polic
   const [isDownloading, setIsDownloading] = useState(false);
 
   const defaultInstitute = {
-    name: "ADAMJEE COACHING CENTRE",
+    name: "SCMS PRO COACHING SYSTEM",
     logo_url: "/logo.png",
     address: "City Branch, Pakistan",
     phone: "+92 123 4567890",
-    email: "info@adamjee.edu.pk"
+    email: "info@scmspro.com"
   };
 
   const institute = instituteProp || defaultInstitute;

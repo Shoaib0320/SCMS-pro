@@ -442,8 +442,8 @@ const SuperAdminStudentsPage = () => {
       };
       
       const instituteData = branches.find(b => b.id === student.branch_id) || {
-        name: 'ADAMJEE COACHING CENTRE',
-        logo_url: '/adamjee-logo.png'
+        name: 'SCMS PRO COACHING SYSTEM',
+        logo_url: '/logo.png'
       };
 
       await generateAndDownloadIdCard({
@@ -489,7 +489,7 @@ const SuperAdminStudentsPage = () => {
 
     /*
      * Same layout as idCardGenerator.js — 3in × 4in portrait
-     * Left 1.1in  = Adamjee pre-printed strip  → blank
+     * Left 1.1in  = SCMS Pro pre-printed strip  → blank
      * Photo       : absolute left:1.4in, top:0.25in,  0.79in × 0.79in
      * Info fields : absolute left:1.1in, top:1.15in,  right:0.1in
      * QR          : absolute left:1.1in, bottom:0.15in, 0.72in × 0.72in

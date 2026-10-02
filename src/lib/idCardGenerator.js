@@ -229,11 +229,11 @@ const createCompleteCardHTML = async (student, institute, policyConfig) => {
   const accentColor = design.accent_color || '#ffffff';
   const textColor = design.text_color || '#ffffff';
   const logoUrl = institute?.logo_url || '/id-logo.png';
-  const instituteName = institute?.name || 'ADAMJEE COACHING CENTRE';
+  const instituteName = institute?.name || 'SCMS PRO COACHING SYSTEM';
   const tagline = institute?.settings?.academic?.school_tagline || 'The Best in Coaching';
   const address = institute?.address || 'North Nazimabad, Karachi, Pakistan';
   const phone = institute?.phone || '+92 123 4567890';
-  const email = institute?.email || 'info@adamjee.edu.pk';
+  const email = institute?.email || 'info@scmspro.com';
 
   const idCardFormat = institute?.settings?.idCardFormat || 'barcode';
   

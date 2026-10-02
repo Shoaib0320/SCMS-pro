@@ -83,7 +83,7 @@ export async function POST(req) {
                 
                 await NotificationService.sendToUsers(studentIds, {
                     title: "Holiday Notification",
-                    message: `Adamjee Coaching Center has announced a holiday for ${date}.${reason ? ` Reason: ${reason}` : ''}`,
+                    message: `SCMS Pro Coaching System has announced a holiday for ${date}.${reason ? ` Reason: ${reason}` : ''}`,
                     type: "holiday",
                     branchId: finalBranchId,
                     sentBy: user.id

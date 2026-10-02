@@ -60,7 +60,7 @@ export default function PositionHoldersTable() {
         <div className="p-6 md:p-8 bg-blue-50/30 border-b border-slate-100">
           <h4 className="text-xl font-bold text-[#1c2450] mb-3">Our Journey of Excellence</h4>
           <p className="text-slate-600 mb-3 leading-relaxed text-sm md:text-base">
-            For over three decades, Adamjee Coaching Centre has consistently helped students transform their dreams into achievements. Every Board Position represents years of hard work, dedicated teaching, disciplined preparation, and the strong partnership between students, parents, and faculty.
+            For over three decades, SCMS Pro Coaching System has consistently helped students transform their dreams into achievements. Every Board Position represents years of hard work, dedicated teaching, disciplined preparation, and the strong partnership between students, parents, and faculty.
           </p>
           <p className="text-slate-600 leading-relaxed text-sm md:text-base">
             Our educational philosophy focuses on understanding concepts, building confidence, and preparing students not only for examinations but also for future academic and professional success.

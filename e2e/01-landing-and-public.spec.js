@@ -7,10 +7,10 @@ test.describe('Public Pages & Landing Flow', () => {
     await page.goto(ROUTES.HOME);
 
     // Verify document title or main brand heading
-    await expect(page).toHaveTitle(/Adamjee/i);
+    await expect(page).toHaveTitle(/SCMS Pro/i);
 
     // Verify brand name in Navbar
-    const brandTitle = page.locator('header').getByText('Adamjee Coaching').first();
+    const brandTitle = page.locator('header').getByText('SCMS Pro').first();
     await expect(brandTitle).toBeVisible();
 
     // Verify main navigation links exist in navbar
@@ -35,7 +35,7 @@ test.describe('Public Pages & Landing Flow', () => {
     expect(page.url()).toContain('/login');
 
     // Verify login card is present
-    await expect(page.getByText('Adamjee Coaching')).toBeVisible();
+    await expect(page.getByText('SCMS Pro')).toBeVisible();
     await expect(page.getByText('Welcome Back')).toBeVisible();
     await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible();
   });

@@ -295,12 +295,12 @@ export async function POST(req) {
           sectionName: targetSection?.name || "",
           email: normalizedEmail,
           password: password, // Plain password for the email
-          branchName: targetBranch?.name || "Adamjee Coaching",
+          branchName: targetBranch?.name || "SCMS Pro",
         });
 
         await sendEmail(
           normalizedEmail,
-          "Welcome to Adamjee Coaching - Student Portal Access",
+          "Welcome to SCMS Pro - Student Portal Access",
           emailHtml,
         );
       } catch (emailError) {

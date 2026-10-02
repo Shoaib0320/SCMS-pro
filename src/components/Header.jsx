@@ -83,7 +83,7 @@ export default function Header({ mobileOpen, setMobileOpen }) {
         {/* Left Section: Title & Breadcrumbs */}
         <div className="flex flex-col animate-in fade-in slide-in-from-top-2 duration-500">
            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-0.5">
-              <Link href="/" className="hover:text-indigo-600 transition-colors">Adamjee</Link>
+              <Link href="/" className="hover:text-indigo-600 transition-colors">SCMS Pro</Link>
               <ChevronDown className="w-2.5 h-2.5 -rotate-90" />
               <span className="text-slate-600 dark:text-slate-400">{getBreadcrumbs[0]}</span>
            </div>

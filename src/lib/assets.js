@@ -1,4 +1,4 @@
-// Centralized Assets File for Adamjee Coaching Centre
+// Centralized Assets File for SCMS Pro Coaching System
 // The user will provide the actual image paths later.
 // Replace these placeholders with actual paths from the public directory (e.g., '/images/hero-bg.jpg')
 
@@ -7,7 +7,7 @@ export const ASSETS = {
   LOGO_PRIMARY: "/logo.png",
   LOGO_LIGHT: "/logo.png", // If a white version exists
 
-  PLAY_STORE_LINK: "https://play.google.com/store/apps/details?id=com.adamjeenorth.coaching",
+  PLAY_STORE_LINK: "https://play.google.com/store/apps/details?id=com.scmspro.coaching",
   // APP_STORE_LINK: "/app-store.png",
 
   // Hero Section

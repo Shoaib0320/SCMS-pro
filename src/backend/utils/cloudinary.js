@@ -16,7 +16,7 @@ cloudinary.config({
 export async function uploadToCloudinary(file, options = {}) {
   try {
     const {
-      folder = 'adamjee-campus12',
+      folder = 'scms-pro',
       resourceType = 'auto',
       format,
       transformation,
@@ -89,7 +89,7 @@ export async function uploadMultipleToCloudinary(files, options = {}) {
  */
 export async function uploadProfilePhoto(file, userId) {
   return uploadToCloudinary(file, {
-    folder: `adamjee-campus12/profiles/${userId}`,
+    folder: `scms-pro/profiles/${userId}`,
     transformation: [
       { width: 500, height: 500, crop: 'fill', gravity: 'face' },
       { quality: 'auto', fetch_format: 'auto' },
@@ -106,7 +106,7 @@ export async function uploadProfilePhoto(file, userId) {
  */
 export async function uploadStudentDocument(file, studentId, documentType) {
   return uploadToCloudinary(file, {
-    folder: `adamjee-campus12/students/${studentId}/${documentType}`,
+    folder: `scms-pro/students/${studentId}/${documentType}`,
     resourceType: 'auto',
   });
 }
@@ -120,7 +120,7 @@ export async function uploadStudentDocument(file, studentId, documentType) {
  */
 export async function uploadTeacherDocument(file, teacherId, documentType) {
   return uploadToCloudinary(file, {
-    folder: `adamjee-campus12/teachers/${teacherId}/${documentType}`,
+    folder: `scms-pro/teachers/${teacherId}/${documentType}`,
     resourceType: 'auto',
   });
 }
@@ -134,7 +134,7 @@ export async function uploadTeacherDocument(file, teacherId, documentType) {
  */
 export async function uploadStaffDocument(file, staffId, documentType) {
   return uploadToCloudinary(file, {
-    folder: `adamjee-campus12/staff/${staffId}/${documentType}`,
+    folder: `scms-pro/staff/${staffId}/${documentType}`,
     resourceType: 'auto',
   });
 }
@@ -148,7 +148,7 @@ export async function uploadStaffDocument(file, staffId, documentType) {
  */
 export async function uploadAdminDocument(file, adminId, documentType) {
   return uploadToCloudinary(file, {
-    folder: `adamjee-campus12/branch-admins/${adminId}/${documentType}`,
+    folder: `scms-pro/branch-admins/${adminId}/${documentType}`,
     resourceType: 'auto',
   });
 }
@@ -162,7 +162,7 @@ export async function uploadAdminDocument(file, adminId, documentType) {
  */
 export async function uploadQR(dataUrl, userId, type) {
   return uploadToCloudinary(dataUrl, {
-    folder: `adamjee-campus12/${type}s/${userId}/qr`,
+    folder: `scms-pro/${type}s/${userId}/qr`,
     resourceType: 'image',
   });
 }
@@ -176,8 +176,8 @@ export async function uploadQR(dataUrl, userId, type) {
  */
 export async function uploadSyllabusPdf(file, classId, branchId = null) {
   const folder = branchId 
-    ? `adamjee-campus12/syllabus/${branchId}/${classId}`
-    : `adamjee-campus12/syllabus/${classId}`;
+    ? `scms-pro/syllabus/${branchId}/${classId}`
+    : `scms-pro/syllabus/${classId}`;
   
   return uploadToCloudinary(file, {
     folder,

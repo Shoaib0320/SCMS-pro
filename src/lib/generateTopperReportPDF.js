@@ -1,5 +1,5 @@
 /**
- * generateTopperReportPDF.js — Adamjee Coaching Centre
+ * generateTopperReportPDF.js — SCMS Pro Coaching System
  * Generates official, print-ready reports:
  * 1. Top 10 Positions Report
  * 2. Complete Result / Merit List
@@ -77,7 +77,7 @@ export async function generateTopperReportPDF({
   doc.setFont("helvetica", "bold");
   doc.setFontSize(18);
   doc.setTextColor(...navyColor);
-  doc.text("ADAMJEE COACHING CENTRE", pageWidth / 2, y + 6, { align: "center" });
+  doc.text("SCMS PRO COACHING SYSTEM", pageWidth / 2, y + 6, { align: "center" });
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
@@ -345,7 +345,7 @@ export async function generateTopperReportPDF({
     doc.setFontSize(7.5);
     doc.setTextColor(148, 163, 184);
     doc.text(
-      "Official computer-generated examination merit report — Adamjee Coaching Centre.",
+      "Official computer-generated examination merit report — SCMS Pro Coaching System.",
       marginLeft,
       pageHeight - 6.5
     );

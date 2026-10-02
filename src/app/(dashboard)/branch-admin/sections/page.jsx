@@ -1,7 +1,7 @@
 import SectionsContent from '@/components/academic/SectionsContent';
 
 export const metadata = {
-  title: 'Sections - Adamjee Coaching',
+  title: 'Sections - SCMS Pro',
   description: 'Manage class sections for your branch.',
 };
 

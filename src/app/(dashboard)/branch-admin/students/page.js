@@ -774,11 +774,11 @@ export default function BranchAdminStudentsPage() {
       };
 
       const instituteData = {
-        name: student.branch?.name || "ADAMJEE COACHING CENTRE",
+        name: student.branch?.name || "SCMS PRO COACHING SYSTEM",
         logo_url: "/logo.png",
         address: student.branch?.address || "City Branch, Pakistan",
         phone: student.branch?.contact?.phone || "+92 123 4567890",
-        email: student.branch?.contact?.email || "info@adamjee.edu.pk",
+        email: student.branch?.contact?.email || "info@scmspro.com",
       };
 
       await generateAndDownloadIdCard({

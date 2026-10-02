@@ -436,7 +436,7 @@ export default function EnterMarksPage({ params }) {
       <div className="hidden print:block print-area">
         <div className="text-center mb-6 mt-10">
           <div className="text-lg font-bold uppercase tracking-widest mb-1 text-slate-700">
-            {user?.branch?.name || "ADAMJEE COACHING"}
+            {user?.branch?.name || "SCMS PRO"}
           </div>
           <h2 className="text-2xl font-bold uppercase tracking-widest">{exam.title} - Mark Sheet</h2>
           <div className="text-sm mt-2 font-semibold text-slate-600">

@@ -1,7 +1,7 @@
 import GroupsContent from '@/components/academic/GroupsContent';
 
 export const metadata = {
-  title: 'Groups - Adamjee Coaching',
+  title: 'Groups - SCMS Pro',
   description: 'Manage study groups for your branch.',
 };
 

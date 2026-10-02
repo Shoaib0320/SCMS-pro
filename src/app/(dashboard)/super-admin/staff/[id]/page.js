@@ -635,7 +635,7 @@ export default function StaffDetailPage() {
     const name = `${staffData.firstName} ${staffData.lastName}`;
     const designation = staffData.staffProfile?.position || 'Staff Member';
     const department = staffData.staffProfile?.departmentId?.name || 'General';
-    const branch = staffData.branchId?.name || 'Adamjee Coaching';
+    const branch = staffData.branchId?.name || 'SCMS Pro';
     const employeeId = staffData.staffProfile?.employeeId || 'N/A';
     const today = format(new Date(), 'MMMM dd, yyyy');
     
@@ -835,7 +835,7 @@ export default function StaffDetailPage() {
                 <span className="text-blue-600 font-bold text-lg">EA</span>
               </div>
               <div className="flex-1">
-                <h1 className="text-lg font-bold">ADAMJEE COACHING</h1>
+                <h1 className="text-lg font-bold">SCMS PRO</h1>
                 <p className="text-xs opacity-90">Staff Identity Card</p>
               </div>
             </div>
@@ -912,7 +912,7 @@ export default function StaffDetailPage() {
             <div className="text-center mb-4">
               <div className="h-8 w-full bg-gradient-to-r from-yellow-400 to-yellow-600 mb-4"></div>
               <h3 className="text-lg font-bold mb-2">OFFICIAL STAFF ID CARD</h3>
-              <p className="text-xs opacity-80">Adamjee Coaching Management System</p>
+              <p className="text-xs opacity-80">SCMS Pro Coaching Management System</p>
             </div>
             
             <div className="space-y-3 text-sm">
@@ -946,11 +946,11 @@ export default function StaffDetailPage() {
               <div className="flex justify-between">
                 <div>
                   <div>ID: {Math.random().toString(36).substr(2, 8).toUpperCase()}</div>
-                  <div>Issued By: Adamjee Coaching HR</div>
+                  <div>Issued By: SCMS Pro HR</div>
                 </div>
                 <div className="text-right">
                   <div>Non-Transferable</div>
-                  <div>Property of Adamjee Coaching</div>
+                  <div>Property of SCMS Pro</div>
                 </div>
               </div>
             </div>
@@ -1859,7 +1859,7 @@ export default function StaffDetailPage() {
                       <span className="text-white font-bold text-2xl print:text-xl">EA</span>
                     </div>
                     <div>
-                      <h1 className="text-3xl font-bold text-blue-900 print:text-2xl">ADAMJEE COACHING</h1>
+                      <h1 className="text-3xl font-bold text-blue-900 print:text-2xl">SCMS PRO</h1>
                       <p className="text-gray-600 mt-2 print:text-sm">Excellence in Education & Administration</p>
                     </div>
                   </div>
@@ -1901,7 +1901,7 @@ export default function StaffDetailPage() {
                       </p>
                       <p className="text-gray-600">{staffData.staffProfile?.position || 'Staff Member'}</p>
                       <p className="text-gray-600">Employee ID: {staffData.staffProfile?.employeeId || 'N/A'}</p>
-                      <p className="text-gray-600">{staffData.branchId?.name || 'Adamjee Coaching'}</p>
+                      <p className="text-gray-600">{staffData.branchId?.name || 'SCMS Pro'}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-gray-500">Ref: {Math.random().toString(36).substr(2, 9).toUpperCase()}</p>

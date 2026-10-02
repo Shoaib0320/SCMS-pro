@@ -1,5 +1,5 @@
 /**
- * Official Adam G Theme Welcome Email Template for Adamjee Coaching Center
+ * Official SCMS Pro Theme Welcome Email Template for SCMS Pro Coaching System
  * Used for Students, Teachers, Staff, and Branch Admins
  */
 export const getWelcomeEmailTemplate = ({
@@ -12,7 +12,7 @@ export const getWelcomeEmailTemplate = ({
   email,
   password,
   branchName,
-  loginUrl = "https://adamjeecoaching.com/login"
+  loginUrl = "https://scmspro.com/login"
 }) => {
   const roleLabel = role?.replace(/_/g, ' ') || 'User';
   const loginId = email || id || grNo || "Your registered email";
@@ -23,7 +23,7 @@ export const getWelcomeEmailTemplate = ({
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Welcome to Adamjee Coaching</title>
+      <title>Welcome to SCMS Pro</title>
       <style>
         body { margin: 0; padding: 0; background-color: #0b1528; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-font-smoothing: antialiased; }
         .wrapper { width: 100%; table-layout: fixed; background-color: #0b1528; padding: 30px 10px; }
@@ -55,8 +55,8 @@ export const getWelcomeEmailTemplate = ({
         <div class="container">
           <!-- Header with Adam G theme & Logo -->
           <div class="header">
-            <img src="cid:adamjee-logo" alt="Adamjee Coaching Centre" class="logo-img" onerror="this.style.display='none'" />
-            <h1 class="inst-title">Adamjee Coaching Centre</h1>
+            <img src="cid:scms-logo" alt="SCMS Pro Coaching System" class="logo-img" onerror="this.style.display='none'" />
+            <h1 class="inst-title">SCMS Pro Coaching System</h1>
             <p class="inst-sub">Excellence In Education Since 1972</p>
             <div class="badge">Official Portal Access</div>
           </div>
@@ -65,7 +65,7 @@ export const getWelcomeEmailTemplate = ({
           <div class="content">
             <h2 class="greeting">Welcome, ${name}!</h2>
             <p class="intro">
-              Your official account has been created on the Adamjee Coaching Management System as a 
+              Your official account has been created on the SCMS Pro Coaching Management System as a 
               <strong>${roleLabel}</strong>${branchName ? ` for <strong>${branchName}</strong>` : ''}.
               Below are your portal login credentials.
             </p>
@@ -114,9 +114,9 @@ export const getWelcomeEmailTemplate = ({
           
           <!-- Footer -->
           <div class="footer">
-            <p style="margin: 0 0 6px 0; font-weight: 600; color: #ffffff;">Adamjee Coaching Centre — Karachi, Pakistan</p>
-            <p style="margin: 0 0 10px 0;">Need help? Contact support at <a href="mailto:support@adamjeecoaching.com">support@adamjeecoaching.com</a></p>
-            <p style="margin: 0; color: #64748b; font-size: 11px;">&copy; 2026 Adamjee Coaching Centre. All rights reserved.</p>
+            <p style="margin: 0 0 6px 0; font-weight: 600; color: #ffffff;">SCMS Pro Coaching System — Karachi, Pakistan</p>
+            <p style="margin: 0 0 10px 0;">Need help? Contact support at <a href="mailto:support@scmspro.com">support@scmspro.com</a></p>
+            <p style="margin: 0; color: #64748b; font-size: 11px;">&copy; 2026 SCMS Pro Coaching System. All rights reserved.</p>
           </div>
         </div>
       </div>

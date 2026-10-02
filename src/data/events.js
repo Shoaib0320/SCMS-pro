@@ -4,20 +4,20 @@ export const EVENTS_DATA = [
     slug: "board-results-2025",
     title: "BIEK Exams 2025 - Remarkable Achievement!",
     date: "2025",
-    location: "Adamjee Coaching Centre",
+    location: "SCMS Pro Coaching System",
     category: "Achievement",
     thumbnail: "/events/board-results-2025/1.jpg",
-    desc: "Celebrating our brilliant students who secured top positions in the BIEK Exams 2025! \n\nCongratulations to Muhammad Umer (5th Position, XII Computer Science, 89% A-1), Muhammad Taha Khan (7th Position, XII Commerce, 86.91%, 1st Position Among Boys), and all our amazing Achievers of IX, X, XI, and XII. A proud moment for Adamjee Coaching Centre as our students continue to shine brightly!"
+    desc: "Celebrating our brilliant students who secured top positions in the BIEK Exams 2025! \n\nCongratulations to Muhammad Umer (5th Position, XII Computer Science, 89% A-1), Muhammad Taha Khan (7th Position, XII Commerce, 86.91%, 1st Position Among Boys), and all our amazing Achievers of IX, X, XI, and XII. A proud moment for SCMS Pro Coaching System as our students continue to shine brightly!"
   },
   {
     id: "award-ceremony",
     slug: "award-ceremony",
     title: "Moments that make us proud 🌟 (A1 Achievers)",
     date: "July 28, 2026",
-    location: "Adamjee Coaching Centre, Campus 12",
+    location: "SCMS Pro Coaching System, Campus 12",
     category: "Celebration",
     thumbnail: "/events/award-ceremony/awardCeremony1.jpeg",
-    desc: "Celebrating our Board Exam A1 achievers at Adamjee Coaching Centre, North Nazimabad Campus 12. Hard work recognized, excellence celebrated, futures shining bright 🎓🏆 #adamjeecoaching #Congratulations #HighAchievers"
+    desc: "Celebrating our Board Exam A1 achievers at SCMS Pro Coaching System, North Nazimabad Campus 12. Hard work recognized, excellence celebrated, futures shining bright 🎓🏆 #scmspro #Congratulations #HighAchievers"
   },
   {
     id: "splash-fest",
@@ -27,24 +27,24 @@ export const EVENTS_DATA = [
     location: "Water Park",
     category: "Picnic",
     thumbnail: "/events/splash-fest/splash-fest-1.jpeg",
-    desc: "🌸 Laughter, memories, and endless fun! Adamjee Coaching Centre Boys & Girls Picnic was truly a day to remember Alhamdulillah 💖 #picnic #girlspicnic #enjoy #adamjeecoachingcentre"
+    desc: "🌸 Laughter, memories, and endless fun! SCMS Pro Coaching System Boys & Girls Picnic was truly a day to remember Alhamdulillah 💖 #picnic #girlspicnic #enjoy #scmspro"
   },
   {
-    id: "adamjee-league",
-    slug: "adamjee-league",
-    title: "Adamjee League (Cricket Tournament)",
+    id: "scms-league",
+    slug: "scms-league",
+    title: "SCMS Pro League (Cricket Tournament)",
     date: "July 28, 2026",
-    location: "Adamjee Coaching Orangi Campus",
+    location: "SCMS Pro Orangi Campus",
     category: "Sports",
-    thumbnail: "/events/adamjee-league/adamjee-league-1.jpeg",
-    desc: "A thrilling day of sportsmanship and team spirit! The Adamjee League cricket tournament brought out the best athletes from our Orangi campus for an unforgettable competition."
+    thumbnail: "/events/scms-league/scms-league-1.jpeg",
+    desc: "A thrilling day of sportsmanship and team spirit! The SCMS Pro League cricket tournament brought out the best athletes from our Orangi campus for an unforgettable competition."
   },
   {
     id: "annual-certificate",
     slug: "annual-certificate",
     title: "Annual Certificate Distribution",
     date: "July 2026",
-    location: "Adamjee Coaching Centre",
+    location: "SCMS Pro Coaching System",
     category: "Academic",
     thumbnail: "/events/annual-certificate/annual-certificate-1.jpeg",
     desc: "Recognizing the hard work and dedication of our students. Certificates were distributed to honor their continuous efforts and outstanding performance."

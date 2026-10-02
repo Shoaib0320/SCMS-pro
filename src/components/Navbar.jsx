@@ -44,7 +44,7 @@ export default function Navbar() {
           <div className="relative h-12 w-12 overflow-hidden rounded-xl border border-slate-100 shadow-sm">
             <Image
               src="/logo.png"
-              alt="Adamjee Coaching logo"
+              alt="SCMS Pro logo"
               fill
               className="object-contain p-1 bg-white"
               sizes="48px"
@@ -53,7 +53,7 @@ export default function Navbar() {
           </div>
           <div>
             <p className="text-lg font-bold tracking-tight text-slate-900">
-              Adamjee Coaching
+              SCMS Pro
             </p>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0f2a5c]">
               Coaching Centre

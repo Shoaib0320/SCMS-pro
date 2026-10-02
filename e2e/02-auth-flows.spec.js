@@ -41,7 +41,7 @@ test.describe('Authentication & Authorization Flows', () => {
     const passwordInput = page.locator('input#password');
     const signInBtn = page.getByRole('button', { name: 'Sign In', exact: true });
 
-    await loginInput.fill('nonexistent.safe.test@adamjee.test');
+    await loginInput.fill('nonexistent.safe.test@scmspro.test');
     await passwordInput.fill('InvalidPassword999!');
     await signInBtn.click();
 

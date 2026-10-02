@@ -1,5 +1,5 @@
 /**
- * Safe Test Constants and Configuration for Live Adamjee Project
+ * Safe Test Constants and Configuration for Live SCMS Pro Project
  *
  * SAFETY NOTICE:
  * All test accounts below are read-only / standard demo users.
@@ -14,7 +14,7 @@ export const TEST_ACCOUNTS = {
     expectedPath: '/super-admin',
   },
   branchAdmin: {
-    login: process.env.TEST_BRANCHADMIN_EMAIL || 'adamjeec12@gmail.com',
+    login: process.env.TEST_BRANCHADMIN_EMAIL || 'admin@scmspro.com',
     password: process.env.TEST_BRANCHADMIN_PASSWORD || 'admin@c12',
     roleName: 'BRANCH_ADMIN',
     expectedPath: '/branch-admin',

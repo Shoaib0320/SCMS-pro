@@ -18,7 +18,7 @@ export default function EventsPage() {
           <p className="text-sky-300 font-medium tracking-widest uppercase text-sm mb-4">Campus Life</p>
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Our Events & Activities</h1>
           <p className="text-blue-100 max-w-2xl mx-auto text-lg leading-relaxed">
-            Discover the vibrant campus life at Adamjee Coaching Centre. We believe in holistic development through sports, celebrations, and academic seminars.
+            Discover the vibrant campus life at SCMS Pro Coaching System. We believe in holistic development through sports, celebrations, and academic seminars.
           </p>
         </div>
       </div>

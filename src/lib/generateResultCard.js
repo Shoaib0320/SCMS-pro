@@ -1,5 +1,5 @@
 /**
- * generateResultCard.js — Adamjee Coaching Centre
+ * generateResultCard.js — SCMS Pro Coaching System
  * Formal, senior-level Result Card. jsPDF v3 compatible.
  */
 
@@ -123,7 +123,7 @@ export async function generateResultCards({ exam, students, marks, single = null
     doc.setFont('times', 'bold');
     doc.setFontSize(17);
     setBlack();
-    doc.text('ADAMJEE COACHING CENTRE', PW / 2, Y, { align: 'center' });
+    doc.text('SCMS PRO COACHING SYSTEM', PW / 2, Y, { align: 'center' });
 
     Y += 5;
     doc.setFont('helvetica', 'normal');

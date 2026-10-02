@@ -99,7 +99,7 @@ export default function StaffAttendanceHistoryModal({ isOpen, onClose, defaultBr
             doc.setTextColor(255, 255, 255);
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(16);
-            doc.text('Adamjee Coaching Center', 42, 14);
+            doc.text('SCMS Pro Coaching System', 42, 14);
             doc.setFontSize(9);
             doc.setFont('helvetica', 'normal');
             doc.text('Campus 12 — Staff & Teacher Attendance Report', 42, 21);
@@ -219,7 +219,7 @@ export default function StaffAttendanceHistoryModal({ isOpen, onClose, defaultBr
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(7);
             doc.setTextColor(150, 130, 200);
-            doc.text('Adamjee Coaching Center — Confidential Staff Attendance Record', pageWidth / 2, finalY + 5, { align: 'center' });
+            doc.text('SCMS Pro Coaching System — Confidential Staff Attendance Record', pageWidth / 2, finalY + 5, { align: 'center' });
 
             // Page numbers
             const pageCount = doc.internal.getNumberOfPages();

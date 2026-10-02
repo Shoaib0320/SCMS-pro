@@ -50,7 +50,7 @@ export const generateSalarySlipPDF = async (payroll, employee) => {
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(22);
-  doc.text('ADAMJEE COACHING', 40, 22);
+  doc.text('SCMS PRO', 40, 22);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.text('Fulfilling Your Educational Needs', 40, 28);
@@ -247,7 +247,7 @@ export const generateSalarySlipPDF = async (payroll, employee) => {
   doc.setTextColor(255, 255, 255);
   doc.text('computer-generated document', 10, pageHeight - 6);
   doc.setTextColor(150, 150, 150);
-  doc.text('© Adamjee Coaching System', 195, pageHeight - 6, { align: 'right' });
+  doc.text('© SCMS Pro System', 195, pageHeight - 6, { align: 'right' });
 
   return Buffer.from(doc.output('arraybuffer'));
 };
@@ -264,7 +264,7 @@ export const generateFeeVoucherPDF = async (voucher, user) => {
   const copyWidth = pageWidth / 2;
   const copies = ['BRANCH COPY', 'PARENT / STUDENT COPY'];
 
-  const branchName = user?.branch?.name || user?.details?.branch_name || 'ADAMJEE COACHING';
+  const branchName = user?.branch?.name || user?.details?.branch_name || 'SCMS PRO';
 
   const studentName = voucher.studentId?.fullName || 
                      `${voucher.studentId?.firstName || ''} ${voucher.studentId?.lastName || ''}`.trim() ||
@@ -446,7 +446,7 @@ export const generateFeeReceiptPDF = async (voucher, paymentHistory = [], user) 
   const copyWidth = pageWidth / 2;
   const copies = ['BRANCH COPY', 'PARENT / STUDENT COPY'];
 
-  const branchName = user?.branch?.name || user?.details?.branch_name || 'ADAMJEE COACHING';
+  const branchName = user?.branch?.name || user?.details?.branch_name || 'SCMS PRO';
 
   const receiptDate = new Date().toLocaleDateString('en-PK', { year: 'numeric', month: 'short', day: 'numeric' });
   const receiptTime = new Date().toLocaleTimeString('en-PK');

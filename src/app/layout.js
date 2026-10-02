@@ -20,7 +20,7 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-  title: "Adamjee Coaching - Coaching Management Center",
+  title: "SCMS Pro - Coaching Management Center",
   description: "Complete coaching management Center ",
   icons: {
     icon: "/favicon-32x32.png",

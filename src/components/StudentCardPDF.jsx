@@ -262,7 +262,7 @@ const StudentCardPDF = ({ student, qrCodeUrl, coachingLogo }) => {
           </View>
 
           <View style={styles.headerTextContainer}>
-            <Text style={styles.coachingName}>ADAMJEE COACHING CENTRE</Text>
+            <Text style={styles.coachingName}>SCMS PRO COACHING SYSTEM</Text>
             <Text style={styles.coachingTagline}>THE BEST IN COACHING</Text>
           </View>
 
@@ -319,7 +319,7 @@ const StudentCardPDF = ({ student, qrCodeUrl, coachingLogo }) => {
               <Text style={styles.instructionText}>• Valid for academic session 2025-26</Text>
             </View>
 
-            <Text style={styles.website}>www.adamjee.edu.pk</Text>
+            <Text style={styles.website}>www.scmspro.com</Text>
           </View>
         </View>
       </Page>

@@ -96,7 +96,7 @@ export default function ExamDetailsModal({ exam, onClose }) {
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 print:text-indigo-700">
                   <GraduationCap className="h-6 w-6" />
-                  <span className="text-sm font-black uppercase tracking-[0.2em]">Adamjee Coaching Centre</span>
+                  <span className="text-sm font-black uppercase tracking-[0.2em]">SCMS Pro Coaching System</span>
                 </div>
                 <CardTitle className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight print:text-2xl print:text-black">
                   {exam.title || "Exam Schedule"}
@@ -222,7 +222,7 @@ export default function ExamDetailsModal({ exam, onClose }) {
                 <div className="h-10 w-48 border-b border-slate-300" />
               </div>
               <p className="text-[9px] text-slate-400 italic font-medium">
-                This is a computer-generated schedule. Adamjee Coaching Centre © {new Date().getFullYear()}
+                This is a computer-generated schedule. SCMS Pro Coaching System © {new Date().getFullYear()}
               </p>
             </div>
 

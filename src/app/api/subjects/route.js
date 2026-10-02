@@ -93,7 +93,7 @@ export async function POST(req) {
         const dataUrl = `data:${file.type};base64,${base64}`;
 
         const uploadResult = await uploadToCloudinary(dataUrl, {
-          folder: `adamjee-campus12/subjects/${name}`,
+          folder: `scms-pro/subjects/${name}`,
           resourceType: "auto",
         });
 

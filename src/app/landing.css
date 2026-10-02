@@ -1,6 +1,6 @@
 
 /* ═══════════════════════════════════════════════
-   ADAMJEE COACHING — LANDING PAGE STYLES
+   SCMS PRO — LANDING PAGE STYLES
    ═══════════════════════════════════════════════ */
 
 /* ROOT — force Outfit everywhere, fallback to system-ui */
@@ -81,7 +81,7 @@
 
 /* GRADIENT TEXT - simplified to solid primary color */
 .lp-gradient-text {
-  color: var(--adamjee-primary, #2563eb);
+  color: var(--scms-primary, #2563eb);
 }
 
 /* SCROLL ANIMATION */
@@ -90,12 +90,12 @@
 
 /* BUTTONS */
 .lp-btn-primary {
-  background: var(--adamjee-primary, #0f2a5c);
+  background: var(--scms-primary, #0f2a5c);
   color: white; border-radius: 8px; padding: 0.875rem 2.25rem;
   font-weight: 600; font-size: 1rem; display: inline-flex; align-items: center;
   border: none; cursor: pointer; transition: all 0.2s ease;
 }
-.lp-btn-primary:hover { background: var(--adamjee-gradient-end, #1e3a8a); }
+.lp-btn-primary:hover { background: var(--scms-gradient-end, #1e3a8a); }
 .lp-btn-lg { padding: 1rem 2.5rem; font-size: 1.05rem; }
 .lp-btn-outline {
   background: white;
@@ -104,7 +104,7 @@
   font-size: 1rem; display: inline-flex; align-items: center;
   transition: all 0.2s ease; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
-.lp-btn-outline:hover { border-color: var(--adamjee-primary, #0f2a5c); color: var(--adamjee-primary, #0f2a5c); background: #f8fafc; }
+.lp-btn-outline:hover { border-color: var(--scms-primary, #0f2a5c); color: var(--scms-primary, #0f2a5c); background: #f8fafc; }
 
 /* ── HERO ── */
 .lp-hero {
@@ -250,7 +250,7 @@
 .lp-section-header { text-align:center; margin-bottom:4rem; }
 .lp-eyebrow {
   font-size:0.75rem; font-weight:700; text-transform:uppercase;
-  letter-spacing:0.3em; color:var(--adamjee-primary, #0f2a5c); margin-bottom:0.75rem;
+  letter-spacing:0.3em; color:var(--scms-primary, #0f2a5c); margin-bottom:0.75rem;
 }
 .lp-section-heading {
   font-size: clamp(1.8rem, 3.5vw, 2.75rem); font-weight:800;
@@ -276,7 +276,7 @@
 }
 .lp-about-badge-years {
   position:absolute; bottom:-20px; right:-10px;
-  background:var(--adamjee-primary, #0f2a5c);
+  background:var(--scms-primary, #0f2a5c);
   color:white; border-radius:1.25rem; padding:1rem 1.5rem;
   text-align:center; box-shadow:0 8px 32px rgba(15, 42, 92, 0.4);
 }
@@ -297,7 +297,7 @@
 }
 .lp-about-badge-years {
   position:absolute; bottom:-20px; right:-10px;
-  background:var(--adamjee-primary, #0f2a5c);
+  background:var(--scms-primary, #0f2a5c);
   color:white; border-radius:1.25rem; padding:1rem 1.5rem;
   text-align:center; box-shadow:0 8px 32px rgba(15, 42, 92, 0.4);
 }
@@ -755,7 +755,7 @@
 .lp-news-ticker {
   position: relative;
   width: 100%;
-  background: var(--adamjee-primary, #0f2a5c);
+  background: var(--scms-primary, #0f2a5c);
   color: white;
   z-index: 10;
   padding: 0.25rem 0;
@@ -768,7 +768,7 @@
   letter-spacing: 0.5px;
 }
 .lp-ticker-label {
-  background: var(--adamjee-secondary, #f59e0b);
+  background: var(--scms-secondary, #f59e0b);
   color: #0f172a;
   padding: 0.25rem 1rem;
   font-weight: 800;

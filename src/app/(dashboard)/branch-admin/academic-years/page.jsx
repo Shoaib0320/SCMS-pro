@@ -1,7 +1,7 @@
 import AcademicYearsContent from '@/components/academic/AcademicYearsContent';
 
 export const metadata = {
-  title: 'Academic Years - Adamjee Coaching',
+  title: 'Academic Years - SCMS Pro',
   description: 'Manage academic years for your branch.',
 };
 

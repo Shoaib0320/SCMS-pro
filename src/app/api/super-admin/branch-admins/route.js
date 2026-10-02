@@ -119,7 +119,7 @@
 //       `;
 //       await sendEmail(
 //         email,
-//         "Welcome to Adamjee Coaching - Branch Admin Access",
+//         "Welcome to SCMS Pro - Branch Admin Access",
 //         emailHtml,
 //       );
 //     }
@@ -396,7 +396,7 @@ async function createBranchAdmin(req) {
 
         await sendEmail(
           cleanEmail,
-          "Welcome to Adamjee Coaching - Your Access is Ready",
+          "Welcome to SCMS Pro - Your Access is Ready",
           emailHtml,
         );
       } catch (emailError) {

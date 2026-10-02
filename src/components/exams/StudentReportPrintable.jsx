@@ -35,10 +35,10 @@ const StudentReportPrintable = React.forwardRef(({
       {/* Header */}
       <div className="flex items-center justify-between border-b-2 border-black pb-4 mb-4">
          <div className="w-24 h-24 bg-slate-200 flex items-center justify-center rounded-full overflow-hidden">
-            <img src="/logo.png" alt="Adamjee Logo" className="w-full h-full object-contain" onError={(e) => { e.target.style.display = 'none' }} />
+            <img src="/logo.png" alt="SCMS Pro Logo" className="w-full h-full object-contain" onError={(e) => { e.target.style.display = 'none' }} />
          </div>
          <div className="text-center flex-1">
-            <h1 className="text-3xl font-bold uppercase tracking-wider text-blue-900" style={{ color: "#0f2a5c" }}>Adamjee Coaching Center</h1>
+            <h1 className="text-3xl font-bold uppercase tracking-wider text-blue-900" style={{ color: "#0f2a5c" }}>SCMS Pro Coaching System</h1>
             <p className="text-sm font-semibold mt-1">{branchInfo?.name}</p>
             <p className="text-xs text-gray-600">{branchInfo?.address}</p>
          </div>

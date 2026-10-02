@@ -13,13 +13,13 @@ const transporter = nodemailer.createTransport({
 export const sendEmail = async (to, subject, html, attachments = []) => {
   const finalAttachments = Array.isArray(attachments) ? [...attachments] : [];
 
-  if (html && html.includes("cid:adamjee-logo") && !finalAttachments.some((a) => a.cid === "adamjee-logo")) {
+  if (html && html.includes("cid:scms-logo") && !finalAttachments.some((a) => a.cid === "scms-logo")) {
     const logoPath = path.join(process.cwd(), "public", "logo.png");
     if (fs.existsSync(logoPath)) {
       finalAttachments.push({
-        filename: "adamjee-logo.png",
+        filename: "logo.png",
         path: logoPath,
-        cid: "adamjee-logo",
+        cid: "scms-logo",
       });
     }
   }

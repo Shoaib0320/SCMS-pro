@@ -1,5 +1,5 @@
 /**
- * generateAdmitCards.js — Adamjee Coaching Centre
+ * generateAdmitCards.js — SCMS Pro Coaching System
  * Formal Admit Card. jsPDF v3 compatible — no unsupported methods.
  */
 
@@ -68,7 +68,7 @@ export async function generateAdmitCards({ exam, students }) {
     doc.setFont('times', 'bold');
     doc.setFontSize(17);
     setBlack();
-    doc.text('ADAMJEE COACHING CENTRE', PW / 2, Y, { align: 'center' });
+    doc.text('SCMS PRO COACHING SYSTEM', PW / 2, Y, { align: 'center' });
 
     Y += 5;
     doc.setFont('helvetica', 'normal');

@@ -55,7 +55,7 @@ export default function WelcomeScreen({ onComplete }) {
           <div className="welcome-logo-img-wrapper">
             <Image
               src="/logo.png"
-              alt="Adamjee Logo"
+              alt="SCMS Pro Logo"
               width={100}
               height={100}
               priority
@@ -65,7 +65,7 @@ export default function WelcomeScreen({ onComplete }) {
         </div>
 
         {/* Brand Text */}
-        <h1 className="welcome-title">Adamjee Coaching</h1>
+        <h1 className="welcome-title">SCMS Pro</h1>
 
         {/* Animated Progress Bar */}
         <div className="welcome-loader-container">

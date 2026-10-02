@@ -110,7 +110,7 @@ export default function SuperAdminReportsPage() {
     // Header
     doc.setFontSize(22);
     doc.setTextColor(30, 41, 59);
-    doc.text('Adamjee Coaching Center', 105, 15, { align: 'center' });
+    doc.text('SCMS Pro Coaching System', 105, 15, { align: 'center' });
     
     doc.setFontSize(14);
     doc.setTextColor(100, 116, 139);

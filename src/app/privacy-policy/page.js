@@ -89,7 +89,7 @@ export default function PrivacyPolicy() {
               Privacy Policy
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-slate-300">
-              At Adamjee Coaching Center, we prioritize the protection and confidentiality of the personal and academic data of our students, parents, and faculty members. Learn how we safeguard your information.
+              At SCMS Pro Coaching System, we prioritize the protection and confidentiality of the personal and academic data of our students, parents, and faculty members. Learn how we safeguard your information.
             </p>
             <div className="mt-8 text-sm text-slate-400">
               <span>Last Updated: May 18, 2026</span>
@@ -155,7 +155,7 @@ export default function PrivacyPolicy() {
               </div>
               <div className="mt-6 space-y-4 text-base leading-relaxed text-slate-600">
                 <p>
-                  Welcome to the <strong>Adamjee Coaching Center Management System</strong>. This platform is designed to streamline academic administrative tasks, parent-teacher collaboration, exam coordination, and student tracking.
+                  Welcome to the <strong>SCMS Pro Coaching System Management System</strong>. This platform is designed to streamline academic administrative tasks, parent-teacher collaboration, exam coordination, and student tracking.
                 </p>
                 <p>
                   This Privacy Policy describes how we collect, store, protect, process, and share personal and academic information across our branch administrative dashboards, parent notification interfaces, student portfolios, and online databases. By accessing our dashboard or services, you consent to the data practices described in this statement.
@@ -326,7 +326,7 @@ export default function PrivacyPolicy() {
                 </p>
                 <h4 className="font-bold text-[#1c2450] mt-4">Data Retention & Archival</h4>
                 <p>
-                  Student academic record metrics are retained as long as the student is actively enrolled at Adamjee Coaching Center. Upon graduation or withdrawal, academic metrics are archived for up to 3 years to support official transcript and verification requests, after which they are thoroughly purged from active clusters.
+                  Student academic record metrics are retained as long as the student is actively enrolled at SCMS Pro Coaching System. Upon graduation or withdrawal, academic metrics are archived for up to 3 years to support official transcript and verification requests, after which they are thoroughly purged from active clusters.
                 </p>
                 <div className="rounded-2xl bg-amber-50 border-l-4 border-amber-500 p-4 text-amber-900 text-sm">
                   <strong>Notice regarding Printed ID Cards:</strong> Student physical ID cards printed with roll numbers, photographs, classes, and QR codes should be handled responsibly. In case of a lost ID card, report to your branch administrator immediately so the matching QR identity values can be refreshed.
@@ -403,7 +403,7 @@ export default function PrivacyPolicy() {
                   If you have concerns, feedback, or operational inquiries regarding this legal policy or how we store your student profiles, contact us directly at our central headquarters or reach out via email support.
                 </p>
                 <div className="mt-6 rounded-2xl bg-gradient-to-br from-[#1c2450] to-[#2a3566] p-6 text-white shadow-lg">
-                  <h4 className="font-bold text-lg text-white">Adamjee Central Compliance Desk</h4>
+                  <h4 className="font-bold text-lg text-white">SCMS Pro Central Compliance Desk</h4>
                   <div className="mt-4 grid gap-4 md:grid-cols-2 text-sm text-slate-200">
                     <div>
                       <p className="font-semibold text-[#b5e7ff]">Corporate Headquarters</p>
@@ -424,12 +424,12 @@ export default function PrivacyPolicy() {
               <h3 className="text-2xl font-bold text-[#1c2450] flex items-center gap-2">
                 <HelpCircle className="h-6 w-6 text-[#76c2e2]" /> Frequently Asked Questions
               </h3>
-              <p className="text-slate-500 text-sm mt-1">Get immediate answers to common privacy queries regarding Adamjee coaching apps.</p>
+              <p className="text-slate-500 text-sm mt-1">Get immediate answers to common privacy queries regarding SCMS Pro coaching apps.</p>
               
               <div className="mt-6 space-y-4">
                 <details className="group rounded-2xl bg-slate-50 border border-slate-100 p-4 transition-all [&_summary::-webkit-details-marker]:hidden">
                   <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-base font-bold text-[#1c2450]">
-                    <span>Does anyone outside Adamjee see my child&apos;s marks sheets?</span>
+                    <span>Does anyone outside SCMS Pro see my child&apos;s marks sheets?</span>
                     <span className="shrink-0 rounded-full bg-white p-1.5 text-slate-400 group-open:rotate-180 transition-transform">
                       <ArrowRight className="h-4 w-4 rotate-90" />
                     </span>

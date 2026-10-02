@@ -1,7 +1,7 @@
 import { defineConfig } from '@playwright/test';
 
 /**
- * Playwright E2E Testing Configuration for Adamjee Coaching
+ * Playwright E2E Testing Configuration for SCMS Pro
  * Configured safely for live application environments.
  */
 export default defineConfig({

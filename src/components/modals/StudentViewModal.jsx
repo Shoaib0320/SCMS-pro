@@ -212,7 +212,7 @@ const StudentViewModal = ({
       logo_url: "/logo.png", // Corrected path
       address: student.branch?.address || "City Branch, Pakistan",
       phone: student.branch?.phone || "+92 123 4567890",
-      email: student.branch?.email || "info@adamjee.edu.pk"
+      email: student.branch?.email || "info@scmspro.com"
     };
 
     return (
