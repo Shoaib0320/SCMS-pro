@@ -1,0 +1,1572 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import apiClient from "@/lib/api-client";
+import { API_ENDPOINTS } from "@/constants/api-endpoints";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import Dropdown from "@/components/ui/dropdown";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Search, Calendar, Edit, Trash2, Plus, BookOpen, Filter, Users, User, Building2 } from "lucide-react";
+import Modal from "@/components/ui/modal";
+import FullPageLoader from "@/components/ui/full-page-loader";
+import { Input } from "@/components/ui/input";
+import ClassSelect from "@/components/ui/class-select";
+import { toast } from "sonner";
+import ButtonLoader from "@/components/ui/button-loader";
+import SimpleTimetableViewModal from "@/components/timetable/SimpleTimetableViewModal";
+import TimePicker from "@/components/ui/time-picker";
+import ConfirmDeleteModal from "@/components/modals/ConfirmDeleteModal";
+import { TimetableGridSkeleton, TimetableSkeleton } from "@/components/ui/skeleton";
+import { getActiveAcademicYear } from "@/lib/utils";
+
+const DAYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
+const PERIOD_TYPES = [
+  { value: "lecture", label: "Lecture" },
+  { value: "lab", label: "Lab" },
+  { value: "practical", label: "Practical" },
+  { value: "break", label: "Break" },
+  { value: "lunch", label: "Lunch" },
+  { value: "assembly", label: "Assembly" },
+  { value: "sports", label: "Sports" },
+  { value: "library", label: "Library" },
+];
+
+export default function BranchTimetablePage() {
+  const { user } = useAuth();
+  const rawBranchId =
+    user?.branch_id ||
+    user?.branchId ||
+    (typeof user?.branch === "object" ? user.branch?.id : "") ||
+    "";
+  
+  // Memoize branchId to ensure consistency
+  const branchId = React.useMemo(() => rawBranchId, [rawBranchId]);
+
+  const [classes, setClasses] = useState([]);
+  const [sections, setSections] = useState([]);
+  const [teachers, setTeachers] = useState([]);
+  const [timetables, setTimetables] = useState([]);
+  const [branchTimetables, setBranchTimetables] = useState([]);
+  const [selectedClass, setSelectedClass] = useState("");
+  const [allSubjects, setAllSubjects] = useState([]);
+  const [classSubjects, setClassSubjects] = useState([]);
+
+  const formatTime12h = (timeStr) => {
+    if (!timeStr) return "--";
+    try {
+      const [hours, minutes] = timeStr.split(":");
+      let h = parseInt(hours);
+      const ampm = h >= 12 ? "PM" : "AM";
+      h = h % 12 || 12;
+      return `${h}:${minutes} ${ampm}`;
+    } catch (e) {
+      return timeStr;
+    }
+  };
+
+  const getTeacherName = (id) => {
+    if (!id) return "N/A";
+    const normalizedId = typeof id === "object" ? (id.id || id._id || id) : id;
+    const t = teachers.find((t) => String(t.id || t._id) === String(normalizedId));
+    return t ? `${t.first_name} ${t.last_name}` : "N/A";
+  };
+  
+  const [selectedSection, setSelectedSection] = useState("");
+  const [selectedTeacher, setSelectedTeacher] = useState("");
+  const [selectedSubject, setSelectedSubject] = useState("");
+  const [selectedAcademicYear, setSelectedAcademicYear] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [viewingTimetable, setViewingTimetable] = useState(null);
+
+  const [showDialog, setShowDialog] = useState(false);
+  const [editingTimetable, setEditingTimetable] = useState(null);
+  const [groups, setGroups] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState("");
+  const [academicYears, setAcademicYears] = useState([]);
+  const [teacherSchedules, setTeacherSchedules] = useState({});
+  const [formData, setFormData] = useState({
+    status: "active",
+    periods: [],
+    academicYear: "",
+    groupId: "",
+    classId: "",
+    section: "",
+    timeSettings: {
+      periodDuration: 40,
+      firstPeriodDuration: 50,
+      breakDuration: 10,
+      lunchDuration: 30,
+      coachingStartTime: "16:00",
+      coachingEndTime: "21:00",
+    },
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [timetableToDelete, setTimetableToDelete] = useState(null);
+
+  useEffect(() => {
+    console.log(
+      "Timetable useEffect (Fetchers) triggered. User:",
+      !!user,
+      "BranchId:",
+      branchId,
+    );
+    if (!user || !branchId) {
+       console.log("⏳ Waiting for user or branchId...", { hasUser: !!user, branchId });
+       return;
+    }
+
+    const loadInitialData = async () => {
+       try {
+         await Promise.all([
+           fetchGroups(),
+           fetchClasses(),
+           fetchTeachers(),
+           fetchAcademicYears(),
+           fetchAllSubjects()
+         ]);
+         
+         // After basic lists are loaded, fetch schedules and tables
+         fetchTeacherSchedulesForBranch(branchId);
+         fetchTimetables(true); // Fetch all for duplicate checks
+         fetchTimetables(false); // Fetch with filters for display
+       } catch (err) {
+         console.error("Error loading initial timetable data:", err);
+       }
+    };
+
+    loadInitialData();
+  }, [user, branchId]);
+
+  // Handle academic year change separately
+  useEffect(() => {
+    if (user && branchId && selectedAcademicYear) {
+      console.log("📅 Academic Year changed, refreshing filtered results...");
+      fetchTimetables(false);
+    }
+  }, [selectedAcademicYear]);
+
+  useEffect(() => {
+    if (formData.classId) {
+      fetchSubjects(formData.classId);
+    } else {
+      setClassSubjects([]);
+    }
+  }, [formData.classId]);
+
+  useEffect(() => {
+    if (selectedClass) {
+      fetchSubjects(selectedClass);
+    } else {
+      // If no class selected in filter, we might want all subjects or empty
+      // Let's keep it empty or all branch subjects
+    }
+  }, [selectedClass]);
+
+  useEffect(() => {
+    if (selectedClass) {
+      fetchSections(selectedClass);
+    }
+  }, [selectedClass]);
+
+  const fetchGroups = async () => {
+    try {
+      const res = await apiClient.get("/api/groups");
+      console.log("Fetched groups:", res);
+      const data = Array.isArray(res) ? res : res.data || res.groups || [];
+      setGroups(data);
+    } catch (e) {
+      console.error("Failed to fetch groups:", e);
+    }
+  };
+
+  const fetchClasses = async () => {
+    try {
+      const res = await apiClient.get(API_ENDPOINTS.BRANCH_ADMIN.CLASSES.LIST, {
+        branch_id: branchId,
+      });
+      setClasses(
+        Array.isArray(res) ? res : res.data?.classes || res.classes || [],
+      );
+    } catch (e) {
+      console.error("Failed to fetch classes:", e);
+    }
+  };
+
+  const fetchSubjects = async (classId) => {
+    if (!classId) return;
+    try {
+      const res = await apiClient.get(API_ENDPOINTS.BRANCH_ADMIN.SUBJECTS.LIST, {
+        class_id: classId
+      });
+      console.log("Fetched class subjects:", res);
+      const data = Array.isArray(res) ? res : res.data || [];
+      setClassSubjects(data);
+    } catch (e) {
+      console.error("Failed to fetch class subjects:", e);
+    }
+  };
+
+  const fetchAllSubjects = async () => {
+    try {
+      const res = await apiClient.get(API_ENDPOINTS.BRANCH_ADMIN.SUBJECTS.LIST);
+      console.log("Fetched all subjects:", res);
+      const data = Array.isArray(res) ? res : res.data || [];
+      setAllSubjects(data);
+    } catch (e) {
+      console.error("Failed to fetch all subjects:", e);
+    }
+  };
+
+  const fetchSections = async (classId) => {
+    try {
+      const cls = classes.find((c) => String(c.id || c._id) === String(classId));
+      if (cls && cls.sections) setSections(cls.sections);
+      else setSections([]);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const fetchExistingTimetable = async (
+    branchIdParam,
+    classId,
+    section,
+    academicYear,
+  ) => {
+    if (!branchIdParam || !classId || !academicYear) return null;
+    try {
+      const url = `${API_ENDPOINTS.BRANCH_ADMIN.TIMETABLES.LIST}?branch_id=${encodeURIComponent(branchIdParam)}&class_id=${encodeURIComponent(classId)}&academic_year_id=${encodeURIComponent(academicYear)}`;
+      const response = await apiClient.get(url);
+      if (
+        response.success &&
+        (Array.isArray(response.data) || Array.isArray(response.timetable))
+      ) {
+        const list = response.data || response.timetable || [];
+        const existing = list.find(
+          (t) =>
+            String(t.class_id || t.classId?.id || t.classId?._id || (typeof t.classId === 'string' ? t.classId : "")) === String(classId) &&
+            String(t.section_id || t.section?.id || t.section?._id || (typeof t.section === 'string' ? t.section : "")) === String(section),
+        );
+        return existing || null;
+      }
+      return null;
+    } catch (error) {
+      console.error("Failed to fetch existing timetable:", error);
+      return null;
+    }
+  };
+
+  const handleSectionChange = (e) => {
+    const sec = typeof e === "object" && e.target ? e.target.value : e;
+    const sRoom = getSectionByName(sec)?.roomNumber || "";
+    setFormData((prev) => ({
+      ...prev,
+      section: sec,
+      periods: (prev.periods || []).map((p) => ({
+        ...p,
+        section: sec,
+        roomNumber: p.roomNumber || sRoom,
+      })),
+    }));
+  };
+
+  const fetchAcademicYears = async () => {
+    try {
+      const res = await apiClient.get("/api/academic-years");
+      console.log("Fetched academic years:", res);
+      const years =
+        res.academic_years || res.data || (Array.isArray(res) ? res : []);
+      setAcademicYears(years);
+      const activeYear = getActiveAcademicYear(years, res.current_academic_year);
+      if (activeYear && !selectedAcademicYear) {
+        setSelectedAcademicYear(activeYear.id);
+        setFormData((prev) => ({ ...prev, academicYear: activeYear.id }));
+      }
+    } catch (e) {
+      console.error("Failed to fetch academic years:", e);
+    }
+  };
+
+  const fetchTeachers = async () => {
+    try {
+      const res = await apiClient.get(
+        `${API_ENDPOINTS.BRANCH_ADMIN.TEACHERS.LIST}?limit=1000`,
+      );
+      if (res.success) {
+        setTeachers(res.data?.teachers || res.data || []);
+      }
+    } catch (e) {
+      console.error("Failed to fetch teachers:", e);
+      toast.error("Failed to load teachers");
+    }
+  };
+
+  const addMinutes = (timeStr, minutes) => {
+    if (!timeStr) return timeStr;
+    const [hh, mm] = timeStr.split(":").map(Number);
+    const date = new Date();
+    date.setHours(hh, mm || 0, 0, 0);
+    date.setMinutes(date.getMinutes() + minutes);
+    const nh = String(date.getHours()).padStart(2, "0");
+    const nm = String(date.getMinutes()).padStart(2, "0");
+    return `${nh}:${nm}`;
+  };
+
+  const getMinutesDifference = (time1, time2) => {
+    const [h1, m1] = time1.split(":").map(Number);
+    const [h2, m2] = time2.split(":").map(Number);
+    const minutes1 = h1 * 60 + m1;
+    const minutes2 = h2 * 60 + m2;
+    return minutes2 - minutes1;
+  };
+
+  const getSectionByName = (sectionName) => {
+    if (!sections || !sectionName) return null;
+    return (
+      sections.find(
+        (s) =>
+          s.name === sectionName ||
+          String(s.id) === String(sectionName) ||
+          String(s._id) === String(sectionName)
+      ) || null
+    );
+  };
+
+  const normalizePeriods = (periods = [], sectionName = "") => {
+    const section = getSectionByName(sectionName);
+    return (periods || []).map((p) => ({
+      ...p,
+      subjectId: p.subjectId?.id || p.subjectId?._id || p.subjectId || p.subject_id || "",
+      teacherId: p.teacherId?.id || p.teacherId?._id || p.teacherId || p.teacher_id || "",
+      roomNumber: p.roomNumber || p.room_no || section?.roomNumber || "",
+      section: p.section || p.section_id || sectionName || "",
+    }));
+  };
+
+  const isDuplicatePeriod = (period, currentIndex = -1) => {
+    return formData.periods.some((p, index) => {
+      if (index === currentIndex) return false;
+      if ((p.day === period.day || p.day === "All Days" || period.day === "All Days") && formData.section === period.section) {
+        if (
+          p.subjectId === period.subjectId &&
+          p.periodNumber === period.periodNumber &&
+          p.startTime === period.startTime &&
+          p.endTime === period.endTime
+        ) {
+          return true;
+        }
+
+        const pStart = p.startTime;
+        const pEnd = p.endTime;
+        const periodStart = period.startTime;
+        const periodEnd = period.endTime;
+
+        if (
+          (periodStart >= pStart && periodStart < pEnd) ||
+          (periodEnd > pStart && periodEnd <= pEnd) ||
+          (periodStart <= pStart && periodEnd >= pEnd)
+        ) {
+          return true;
+        }
+      }
+      return false;
+    });
+  };
+
+  const addPeriod = () => {
+    if (!formData.section) {
+      toast.error("Please select a section first!");
+      return;
+    }
+
+    const defaultStartTime = "14:00"; // 2:00 PM as requested
+    const periodDuration = formData.timeSettings.periodDuration || 45;
+    
+    // Find the last period across any day to determine the next time slot
+    let nextStart = defaultStartTime;
+    if (formData.periods && formData.periods.length > 0) {
+      // Find the maximum end time across all periods
+      const maxMinutes = Math.max(...formData.periods.map(p => timeToMinutes(p.endTime)));
+      const hours = Math.floor(maxMinutes / 60);
+      const mins = maxMinutes % 60;
+      nextStart = `${String(hours).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
+    }
+
+    const nextEnd = addMinutes(nextStart, periodDuration);
+    
+    const sameDayCount = formData.periods.filter(p => p.day === "All Days").length;
+    const newPeriod = {
+      periodNumber: sameDayCount + 1,
+      day: "All Days",
+      startTime: nextStart,
+      endTime: nextEnd,
+      subjectId: "",
+      teacherId: "",
+      periodType: "lecture",
+      roomNumber: getSectionByName(formData.section)?.roomNumber || "",
+      section: formData.section,
+    };
+
+    setFormData({ ...formData, periods: [...formData.periods, newPeriod] });
+    toast.success(`Added period (${nextStart} - ${nextEnd}) for All Days`);
+  };
+
+  const updatePeriod = (index, field, value) => {
+    const updatedPeriods = [...formData.periods];
+    const period = { ...updatedPeriods[index], [field]: value };
+    updatedPeriods[index] = period;
+
+    if (["day", "startTime", "endTime", "teacherId"].includes(field)) {
+      if (isDuplicatePeriod(period, index)) {
+        toast.warning("Warning: This time slot overlaps with another period in this section!");
+        // Removed return; to allow user to type and fix the time
+      }
+
+      if (period.teacherId && field !== "teacherId") {
+        const conflict = isTeacherAvailable(
+          period.teacherId,
+          period.day,
+          period.startTime,
+          period.endTime,
+          editingTimetable?.id,
+          index,
+          period.subjectId
+        );
+        if (conflict) {
+          toast.warning(`Combined Class Mode: Teacher is also scheduled in ${conflict.className} - ${conflict.sectionName} at this time.`);
+          // Removed return; to allow the jugad for combined classes
+        }
+      }
+
+      if (field === "teacherId" && value) {
+        const conflict = isTeacherAvailable(
+          value,
+          period.day,
+          period.startTime,
+          period.endTime,
+          editingTimetable?.id,
+          index,
+          period.subjectId
+        );
+        if (conflict) {
+          toast.warning(`Combined Class Mode: Teacher is also scheduled in ${conflict.className} - ${conflict.sectionName} at this time.`);
+          // Removed return; to allow the jugad for combined classes
+        }
+      }
+    }
+    setFormData({ ...formData, periods: updatedPeriods });
+  };
+
+  const removePeriod = (index) => {
+    const updated = formData.periods.filter((_, i) => i !== index);
+    setFormData({ ...formData, periods: updated });
+  };
+
+  const timeToMinutes = (timeStr) => {
+    if (!timeStr) return 0;
+    try {
+      // Handle cases like "08:00 AM" or just "08:00"
+      const parts = timeStr.trim().split(/\s+/);
+      const timePart = parts[0];
+      const modifier = parts[1]; // AM/PM
+
+      let [hours, minutes] = timePart.split(":").map(Number);
+      if (isNaN(hours)) return 0;
+      if (isNaN(minutes)) minutes = 0;
+
+      if (modifier) {
+        if (modifier.toUpperCase() === "PM" && hours < 12) hours += 12;
+        if (modifier.toUpperCase() === "AM" && hours === 12) hours = 0;
+      }
+      return hours * 60 + minutes;
+    } catch (e) {
+      console.error("Error parsing time:", timeStr, e);
+      return 0;
+    }
+  };
+
+  const isTeacherAvailable = (
+    teacherId,
+    day,
+    startTime,
+    endTime,
+    currentTimetableId = null,
+    currentPeriodIndex = -1,
+    subjectId = null
+  ) => {
+    if (subjectId) {
+      const subject = allSubjects.find(s => String(s.id) === String(subjectId));
+      if (subject?.is_applicable_for_all_groups) {
+        return null;
+      }
+    }
+
+    if (!teacherId || !day || !startTime || !endTime) return null;
+    
+    const normalizedTeacherId = typeof teacherId === "object" ? teacherId.id || teacherId._id || teacherId : teacherId;
+    if (!normalizedTeacherId) return null;
+
+    const cleanTid = String(normalizedTeacherId).trim();
+    const teacherObj = teachers.find(t => String(t.id || t._id).trim() === cleanTid);
+    const teacherName = teacherObj ? `${teacherObj.first_name} ${teacherObj.last_name}` : cleanTid;
+
+    console.log(`🔍 Checking conflict for [${teacherName}] on ${day} at ${startTime}-${endTime}`);
+
+    const nStart = timeToMinutes(startTime);
+    const nEnd = timeToMinutes(endTime);
+    const nDay = String(day || "").trim().toLowerCase();
+
+    console.log(`🔎 Comparing [${nDay} ${nStart}-${nEnd}] for Teacher [${teacherName}]`);
+
+    // 1. Check existing timetables in database
+    const teacherSchedule = teacherSchedules[cleanTid] || [];
+    if (teacherSchedule.length === 0) {
+       // console.log(`📭 No schedule found for teacher [${teacherName}] in map.`);
+    }
+    const dbConflict = teacherSchedule.find((s) => {
+      // Ignore if it's the same timetable we are currently editing
+      if (currentTimetableId && (String(s.timetableId) === String(currentTimetableId) || String(s.timetable_id) === String(currentTimetableId)))
+        return false;
+      
+      const sDay = String(s.day || s.day_of_week || "").trim().toLowerCase();
+      // console.log(`   - Comparing with DB Entry: ${sDay} ${pStart}-${pEnd}`);
+      if (sDay !== nDay && sDay !== "all days" && nDay !== "all days") return false;
+
+      const pStart = timeToMinutes(s.startTime || s.start_time);
+      const pEnd = timeToMinutes(s.endTime || s.end_time);
+
+      // Overlap: (StartA < EndB) AND (EndA > StartB)
+      const isOverlap = (nStart < pEnd && nEnd > pStart);
+      
+      if (isOverlap) {
+        console.log(`✅ [DB Conflict] [${teacherName}] is ALREADY busy in ${s.className} (${s.startTime}-${s.endTime})`);
+      } else {
+        if (nDay === sDay) {
+          console.log(`ℹ️ [No Overlap] [${teacherName}] vs ${s.className}: ${nStart}-${nEnd} vs ${pStart}-${pEnd}`);
+        }
+      }
+      return isOverlap;
+    });
+
+    if (dbConflict) return dbConflict;
+
+    // 2. Check current form periods (internal conflicts)
+    const formConflict = formData.periods.find((p, idx) => {
+      if (idx === currentPeriodIndex) return false;
+      
+      const pTid = typeof p.teacherId === "object" ? p.teacherId.id || p.teacherId._id || p.teacherId : p.teacherId;
+      if (!pTid || String(pTid).trim() !== cleanTid) return false;
+
+      const pDay = String(p.day || "").trim().toLowerCase();
+      if (pDay !== nDay && pDay !== "all days" && nDay !== "all days") return false;
+
+      const pStart = timeToMinutes(p.startTime);
+      const pEnd = timeToMinutes(p.endTime);
+
+      const isOverlap = (nStart < pEnd && nEnd > pStart);
+      if (isOverlap) {
+        console.log(`✅ [Form Conflict] [${teacherName}] already has period at index ${idx}`);
+      }
+      return isOverlap;
+    });
+
+    return formConflict
+      ? { ...formConflict, className: "Current", sectionName: "Draft", day: formConflict.day || day }
+      : null;
+  };
+
+  const getAvailableTeachers = (
+    day,
+    startTime,
+    endTime,
+    currentPeriodIndex = -1,
+    currentTeacherId = null,
+    subjectId = null
+  ) => {
+    if (!day || !startTime || !endTime) {
+      return teachers.map((t) => ({
+        value: t.id || t._id,
+        label: `${t.first_name} ${t.last_name}`,
+      }));
+    }
+
+    const currentTimetableId = editingTimetable?.id || editingTimetable?._id || null;
+    
+    return teachers.map((teacher) => {
+      const teacherId = teacher.id || teacher._id;
+      const conflict = isTeacherAvailable(
+        teacherId,
+        day,
+        startTime,
+        endTime,
+        currentTimetableId,
+        currentPeriodIndex,
+        subjectId
+      );
+
+      const isCurrent = currentTeacherId && (
+        typeof currentTeacherId === "object" 
+          ? (currentTeacherId.id || currentTeacherId._id) === teacherId 
+          : String(currentTeacherId) === String(teacherId)
+      );
+
+      let label = `${teacher.first_name} ${teacher.last_name}`;
+      if (conflict && !isCurrent) {
+        label += ` (Busy in ${conflict.className}${conflict.sectionName ? ` - ${conflict.sectionName}` : ""})`;
+      }
+
+      return {
+        value: teacherId,
+        label: label,
+        disabled: false, // Allow selection for combined classes
+      };
+    });
+  };
+
+  const fetchTeacherSchedulesForBranch = async (
+    branchIdParam,
+  ) => {
+    console.log("🚀 fetchTeacherSchedulesForBranch called with:", { branchIdParam });
+    if (!branchIdParam) {
+      console.log("⚠️ Skipping fetchTeacherSchedulesForBranch due to missing branchId");
+      return;
+    }
+    try {
+      // 1. Fetch ALL teachers for this branch first
+      const res = await apiClient.get(
+        `${API_ENDPOINTS.BRANCH_ADMIN.TEACHERS.LIST}?branchId=${branchIdParam}&limit=1000`,
+      );
+      const teachersList = Array.isArray(res)
+        ? res
+        : res.data?.teachers || res.teachers || res.data || [];
+      setTeachers(teachersList);
+
+      // 2. Fetch ALL timetables for this branch (across all academic years) to ensure no conflicts
+      const ttUrl = `${API_ENDPOINTS.BRANCH_ADMIN.TIMETABLES.LIST}?branch_id=${encodeURIComponent(branchIdParam)}&limit=2000`;
+      const ttRes = await apiClient.get(ttUrl);
+      console.log("📡 Timetable API Response (All Years for Conflict Check):", ttRes);
+      
+      let ttList = [];
+      if (ttRes.success) {
+        ttList = ttRes.data || ttRes.timetable || [];
+      } else if (Array.isArray(ttRes)) {
+        ttList = ttRes;
+      } else if (ttRes.data) {
+        ttList = ttRes.data;
+      } else if (ttRes.timetable) {
+        ttList = ttRes.timetable;
+      }
+
+      console.log(`📋 Processing ${ttList.length} timetables for GLOBAL branch conflicts...`);
+
+      const map = {};
+      ttList.forEach((tt) => {
+        const ttId = tt.id || tt._id;
+        (tt.periods || []).forEach((p) => {
+          const tId = p.teacherId || p.teacher_id;
+          if (!tId) return;
+          const normalizedTid = typeof tId === "object" ? tId.id || tId._id || tId : tId;
+          if (!map[normalizedTid]) map[normalizedTid] = [];
+          
+          const entry = {
+            day: p.day || p.day_of_week,
+            startTime: p.startTime || p.start_time,
+            endTime: p.endTime || p.end_time,
+            timetableId: ttId,
+            className: tt.class?.name || tt.classId?.name || tt.class_id?.name || "N/A",
+            sectionName: tt.section?.name || tt.sectionId?.name || tt.section_id?.name || "N/A",
+            academicYear: tt.academicYear?.year || tt.academicYearId?.year || "N/A"
+          };
+          
+          map[normalizedTid].push(entry);
+        });
+      });
+      console.log("🛠️ Generated Teacher Schedule Map:", map);
+      console.log(`📅 Mapped schedules for ${Object.keys(map).length} teachers.`);
+      setTeacherSchedules(map);
+    } catch (e) {
+      console.error("❌ Error in fetchTeacherSchedulesForBranch:", e);
+    }
+  };
+
+  const fetchTimetables = async (fetchAll = false) => {
+    setLoading(true);
+    try {
+      const params = fetchAll
+        ? { branch_id: branchId }
+        : {
+            branch_id: branchId,
+            class_id: selectedClass || undefined,
+            section_id: selectedSection || undefined,
+            academic_year_id: selectedAcademicYear || undefined,
+            teacher_id: selectedTeacher || undefined,
+            subject_id: selectedSubject || undefined,
+          };
+
+      const res = await apiClient.get(
+        API_ENDPOINTS.BRANCH_ADMIN.TIMETABLES.LIST,
+        params,
+      );
+      console.log("📡 Timetable API Response Data:", res);
+      if (res.success) {
+        const data = res.data || [];
+        if (fetchAll) {
+          setBranchTimetables(data);
+        } else {
+          setTimetables(data);
+          // Show toast for non-initial loads or loads with specific filters
+          const hasFilters = selectedClass || selectedSection || selectedTeacher || selectedSubject || selectedAcademicYear;
+          if (hasFilters) {
+            if (data.length === 0) {
+              toast.info("No timetables found matching your search criteria");
+            } else {
+              toast.success(`Found ${data.length} timetables`);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Failed to fetch timetables:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateNew = async () => {
+    setEditingTimetable(null);
+    setFormData((prev) => ({
+      ...prev,
+      name: "",
+      academicYear: selectedAcademicYear || "2024-2025",
+      classId: "",
+      section: "",
+      periods: [],
+    }));
+    setShowDialog(true);
+  };
+
+  const handleEdit = (timetable) => {
+    console.log("Editing timetable:", timetable);
+    setEditingTimetable(timetable);
+    
+    // Normalize IDs from various possible structures (nested object or plain ID)
+    const classId = timetable.class_id || timetable.class?.id || timetable.classId?.id || (typeof timetable.classId === 'string' ? timetable.classId : "");
+    const sectionId = timetable.section_id || timetable.section?.id || timetable.sectionId?.id || (typeof timetable.section === 'string' ? timetable.section : "");
+    const academicYearId = timetable.academic_year_id || timetable.academicYear?.id || timetable.academicYearId?.id || (typeof timetable.academicYear === 'string' ? timetable.academicYear : "");
+
+    // Find groupId from the classes list
+    const selectedClassObj = classes.find(c => String(c.id) === String(classId));
+    const groupId = selectedClassObj?.group_id || "";
+
+    if (classId) {
+      fetchSections(classId);
+      fetchSubjects(classId);
+    }
+
+    setFormData({
+      ...formData,
+      groupId: groupId,
+      classId: classId,
+      section: sectionId,
+      academicYear: academicYearId,
+      periods: (timetable.periods || []).map((p) => ({
+        ...p,
+        day: p.day || p.day_of_week,
+        startTime: p.startTime || p.start_time,
+        endTime: p.endTime || p.end_time,
+        subjectId: p.subjectId || p.subject_id || "",
+        teacherId: p.teacherId || p.teacher_id || "",
+        roomNumber: p.roomNumber || p.room_no,
+        periodType: p.periodType || p.period_type,
+      })),
+      timeSettings: timetable.timeSettings || {
+        periodDuration: 40,
+        firstPeriodDuration: 50,
+        breakDuration: 10,
+        lunchDuration: 30,
+        coachingStartTime: "08:00",
+        coachingEndTime: "14:00",
+      },
+    });
+    setShowDialog(true);
+  };
+
+  const handleSubmit = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    // Final validation for teacher conflicts
+    for (let i = 0; i < formData.periods.length; i++) {
+      const p = formData.periods[i];
+      if (!p.teacherId) continue;
+
+      const conflict = isTeacherAvailable(
+        p.teacherId,
+        p.day,
+        p.startTime,
+        p.endTime,
+        editingTimetable?.id,
+        i,
+        p.subjectId
+      );
+
+      if (conflict) {
+        toast.warning(
+          `Combined Class Mode: Teacher is already assigned to ${conflict.className} (${conflict.sectionName}) on ${conflict.day} at ${conflict.startTime}. Saving anyway.`,
+        );
+        // Removed return; to allow saving combined classes
+      }
+    }
+
+    setSubmitting(true);
+    try {
+      const payload = {
+        class_id: formData.classId,
+        section_id: formData.section,
+        academic_year_id: formData.academicYear,
+        periods: formData.periods.map((p) => ({
+          day: p.day,
+          startTime: p.startTime,
+          endTime: p.endTime,
+          subjectId: p.subjectId,
+          teacherId: p.teacherId,
+          roomNumber: p.roomNumber,
+          periodType: p.periodType,
+        })),
+      };
+      let res;
+      if (editingTimetable && editingTimetable.id) {
+        res = await apiClient.put(
+          API_ENDPOINTS.BRANCH_ADMIN.TIMETABLES.UPDATE(editingTimetable.id),
+          payload,
+        );
+      } else {
+        res = await apiClient.post(
+          API_ENDPOINTS.BRANCH_ADMIN.TIMETABLES.CREATE,
+          payload,
+        );
+      }
+
+      if (res?.success) {
+        toast.success("Timetable saved");
+        setShowDialog(false);
+        fetchTimetables();
+        fetchTeacherSchedulesForBranch(branchId, formData.academicYear);
+      } else {
+        toast.error(res?.error || res?.message || "Failed to save timetable");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "Failed to save timetable");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = (id) => {
+    setTimetableToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!timetableToDelete) return;
+    try {
+      const res = await apiClient.delete(
+        `${API_ENDPOINTS.BRANCH_ADMIN.TIMETABLES.DELETE(timetableToDelete)}?id=${encodeURIComponent(timetableToDelete)}`,
+      );
+      if (res?.success) {
+        toast.success(res.message || "Deleted");
+        fetchTimetables();
+        fetchTeacherSchedulesForBranch(branchId, selectedAcademicYear);
+      } else {
+        toast.error(res?.message || "Failed to delete");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete timetable");
+    } finally {
+      setShowDeleteModal(false);
+      setTimetableToDelete(null);
+    }
+  };
+
+  const viewTimetable = (tt) => {
+    // If teacher selected, aggregate teacher periods across fetched timetables
+    if (selectedTeacher) {
+      const aggregated = [];
+      timetables.forEach((t) => {
+        (t.periods || []).forEach((p) => {
+          const pTid = p.teacherId || p.teacher_id;
+          const normalizedTid =
+            typeof pTid === "object" ? pTid.id || pTid : pTid;
+          if (String(normalizedTid) === String(selectedTeacher)) {
+            aggregated.push({
+              ...p,
+              className: t.class?.name || t.classId?.name,
+              sectionName: t.section?.name || t.sectionId?.name,
+            });
+          }
+        });
+      });
+      const teacherObj = teachers.find(
+        (t) => String(t.id) === String(selectedTeacher),
+      );
+      setViewingTimetable({
+        name: `Teacher Schedule - ${teacherObj ? `${teacherObj.first_name} ${teacherObj.last_name}` : selectedTeacher}`,
+        periods: aggregated,
+      });
+      return;
+    }
+
+    setViewingTimetable(tt);
+  };
+
+  return (
+    <div className="container mx-auto p-6">
+      {loading && timetables.length === 0 ? (
+        <TimetableSkeleton />
+      ) : (
+        <>
+          <div className="flex justify-between items-center mb-4">
+            <div>
+              <h1 className="text-2xl font-bold">Branch Timetables</h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                View and manage campus class schedules.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={handleCreateNew} disabled={loading} className="font-bold shadow-lg shadow-indigo-500/10">
+                <Plus className="mr-2 h-4 w-4" />
+                Create Timetable
+              </Button>
+            </div>
+          </div>
+
+      <Card className="border-none shadow-sm bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border border-slate-200 dark:border-slate-800 mb-6">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-lg font-bold">
+              <Filter className="h-5 w-5 text-indigo-500" />
+              Filter Schedule
+            </CardTitle>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => {
+                setSelectedGroup("");
+                setSelectedClass("");
+                setSelectedSection("");
+                setSelectedTeacher("");
+                setSelectedSubject("");
+                setSelectedAcademicYear("");
+                setFormData(prev => ({ ...prev, subjectId: "" }));
+                fetchTimetables();
+              }}
+              className="text-xs font-bold text-slate-500 hover:text-indigo-600 transition-colors"
+            >
+              Reset All
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+            <div className="space-y-2">
+              <Label className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
+                <BookOpen className="h-3 w-3" />
+                Group
+              </Label>
+              <Dropdown
+                value={selectedGroup}
+                onChange={(e) => {
+                  setSelectedGroup(e.target.value);
+                  setSelectedClass("");
+                  setSelectedSection("");
+                }}
+                options={[
+                  { value: "", label: "All Groups" },
+                  ...groups.map((g) => ({ value: g.id, label: g.name })),
+                ]}
+                className="bg-white dark:bg-slate-950 font-medium"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
+                <Building2 className="h-3 w-3" />
+                Class
+              </Label>
+              <Dropdown
+                value={selectedClass}
+                onChange={(e) => setSelectedClass(e.target.value)}
+                options={[
+                  { value: "", label: "All Classes" },
+                  ...classes
+                    .filter(
+                      (c) => !selectedGroup || c.group_id === selectedGroup,
+                    )
+                    .map((c) => ({ value: c.id, label: c.name })),
+                ]}
+                className="bg-white dark:bg-slate-950 font-medium"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
+                <Users className="h-3 w-3" />
+                Section
+              </Label>
+              <Dropdown
+                value={selectedSection}
+                onChange={(e) => setSelectedSection(e.target.value)}
+                options={[
+                  { value: "", label: "All Sections" },
+                  ...sections.map((s) => ({ value: s.id, label: s.name })),
+                ]}
+                className="bg-white dark:bg-slate-950 font-medium"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
+                <User className="h-3 w-3" />
+                Teacher
+              </Label>
+              <Dropdown
+                value={selectedTeacher}
+                onChange={(e) => setSelectedTeacher(e.target.value)}
+                options={[
+                  { value: "", label: "All Teachers" },
+                  ...teachers.map((t) => ({
+                    value: t.id,
+                    label: `${t.first_name} ${t.last_name}`,
+                  })),
+                ]}
+                className="bg-white dark:bg-slate-950 font-medium"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
+                <BookOpen className="h-3 w-3" />
+                Subject
+              </Label>
+              <Dropdown
+                value={selectedSubject}
+                onChange={(e) => setSelectedSubject(e.target.value)}
+                options={[
+                  { value: "", label: "All Subjects" },
+                  ...classSubjects.map((s) => ({ value: s.id, label: s.is_applicable_for_all_groups ? `${s.name} (All Group)` : s.name })),
+                ]}
+                disabled={!selectedClass}
+                className="bg-white dark:bg-slate-950 font-medium"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
+                <Calendar className="h-3 w-3" />
+                Academic Year
+              </Label>
+              <Dropdown
+                value={selectedAcademicYear}
+                onChange={(e) => setSelectedAcademicYear(e.target.value)}
+                options={[
+                  { value: "", label: "All Years" },
+                  ...academicYears.map((y) => ({ value: y.id, label: y.name })),
+                ]}
+                className="bg-white dark:bg-slate-950 font-medium"
+              />
+            </div>
+          </div>
+
+          <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+            <Button
+              onClick={() => fetchTimetables()}
+              className="px-8 font-bold shadow-lg transition-all"
+              disabled={loading}
+            >
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <span>Searching...</span>
+                </div>
+              ) : (
+                <>
+                  <Search className="mr-2 h-4 w-4" />
+                  Apply Filters
+                </>
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="mt-8 overflow-hidden border-none shadow-lg">
+        <CardHeader className="bg-white dark:bg-gray-800 pb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">
+                Existing Timetables
+              </CardTitle>
+              <CardDescription className="text-sm text-gray-500">
+                Manage and view schedules for your branch
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-900/30 dark:text-blue-400">
+                {timetables.length} Total
+              </span>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          {loading ? (
+            <div className="p-6">
+               <TimetableGridSkeleton />
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-gray-50/50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
+                    <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                      Class & Section
+                    </th>
+                    <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                      Academic Year
+                    </th>
+                    <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500 text-center">
+                      Periods
+                    </th>
+                    <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                      Last Modified
+                    </th>
+                    <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                  {timetables.length === 0 ? (
+                    <tr>
+                      <td colSpan="5" className="px-6 py-16 text-center">
+                        <div className="flex flex-col items-center gap-3">
+                          <Calendar className="h-10 w-10 text-gray-300" />
+                          <p className="text-gray-500 font-medium">
+                            No timetables found.
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            Try adjusting your filters or create a new one.
+                          </p>
+                          {(selectedClass || selectedSection || selectedTeacher || selectedSubject || selectedAcademicYear) && (
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="mt-4"
+                              onClick={() => {
+                                setSelectedGroup("");
+                                setSelectedClass("");
+                                setSelectedSection("");
+                                setSelectedTeacher("");
+                                setSelectedSubject("");
+                                setSelectedAcademicYear("");
+                                fetchTimetables();
+                              }}
+                            >
+                              Clear Filters
+                            </Button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    timetables.map((tt) => (
+                      <tr
+                        key={tt.id}
+                        className="hover:bg-gray-50/50 dark:hover:bg-gray-900/20 transition-all duration-200"
+                      >
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400">
+                              <BookOpen className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <div className="font-bold text-gray-900 dark:text-white">
+                                {tt.class?.name || "N/A"}
+                              </div>
+                              <div className="text-xs text-gray-500 font-medium uppercase tracking-tight">
+                                Section {tt.section?.name || "All"}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                            {tt.academicYear?.name ||
+                              tt.academicYearId?.name ||
+                              tt.academic_year_id?.name ||
+                              tt.academicYear ||
+                              "N/A"}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <div className="inline-flex items-center justify-center h-7 px-3 rounded-md bg-emerald-50 text-emerald-700 text-xs font-bold dark:bg-emerald-900/20 dark:text-emerald-400">
+                            {tt.periods?.length || 0} Slots
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-xs text-gray-500">
+                            {new Date(
+                              tt.updated_at || tt.created_at,
+                            ).toLocaleDateString()}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title="View Calendar"
+                              onClick={() => setViewingTimetable(tt)}
+                              className="h-8 w-8 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                            >
+                              <Calendar className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title="Edit"
+                              onClick={() => handleEdit(tt)}
+                              className="h-8 w-8 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title="Delete"
+                              onClick={() => handleDelete(tt.id)}
+                              className="h-8 w-8 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Create / Edit Modal */}
+      <Modal
+        open={showDialog}
+        onClose={() => setShowDialog(false)}
+        title={editingTimetable ? "Edit Timetable" : "Create Timetable"}
+        size="xl"
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" form="timetable-form" disabled={submitting}>
+              {submitting
+                ? "Saving..."
+                : editingTimetable
+                  ? "Update"
+                  : "Create"}
+            </Button>
+          </div>
+        }
+      >
+        <form id="timetable-form" onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Academic Year *</Label>
+              <Dropdown
+                value={formData.academicYear}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setFormData({ ...formData, academicYear: val });
+                  if (branchId) fetchTeacherSchedulesForBranch(branchId, val);
+                }}
+                options={
+                  academicYears.length > 0
+                    ? academicYears.map((y) => ({ value: y.id, label: y.name }))
+                    : [{ value: "", label: "No record found", disabled: true }]
+                }
+                placeholder="Select Year"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Group *</Label>
+              <Dropdown
+                value={formData.groupId}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setFormData({
+                    ...formData,
+                    groupId: val,
+                    classId: "",
+                    section: "",
+                    periods: [],
+                  });
+                }}
+                options={
+                  groups.length > 0
+                    ? groups.map((g) => ({ value: g.id, label: g.name }))
+                    : [{ value: "", label: "No record found", disabled: true }]
+                }
+                placeholder="Select Group"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Class *</Label>
+              <Dropdown
+                value={formData.classId}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setFormData({
+                    ...formData,
+                    classId: val,
+                    section: "",
+                    periods: [],
+                  });
+                  if (val) {
+                    fetchSections(val);
+                    fetchSubjects(val);
+                  }
+                }}
+                options={(() => {
+                  if (!formData.groupId)
+                    return [
+                      {
+                        value: "",
+                        label: "Please select Group first",
+                        disabled: true,
+                      },
+                    ];
+                  const filtered = classes.filter(
+                    (c) => c.group_id === formData.groupId,
+                  );
+                  return filtered.length > 0
+                    ? filtered.map((c) => ({ value: c.id, label: c.name }))
+                    : [{ value: "", label: "No record found", disabled: true }];
+                })()}
+                disabled={!formData.groupId}
+                placeholder="Select Class"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Section *</Label>
+              <Dropdown
+                value={formData.section}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  handleSectionChange(val);
+                }}
+                options={(() => {
+                  if (!formData.classId)
+                    return [
+                      {
+                        value: "",
+                        label: "Please select Class first",
+                        disabled: true,
+                      },
+                    ];
+
+                  // Filter out sections that already have a timetable using FULL branch list
+                  const usedSectionIds = branchTimetables
+                    .filter(
+                      (tt) =>
+                        (String(tt.class_id || tt.class?.id || tt.classId?.id || (typeof tt.classId === 'string' ? tt.classId : "")) === String(formData.classId)) &&
+                        (String(tt.academic_year_id || tt.academicYear?.id || tt.academicYearId?.id || (typeof tt.academicYear === 'string' ? tt.academicYear : "")) === String(formData.academicYear)) &&
+                        (!editingTimetable || tt.id !== editingTimetable.id),
+                    )
+                    .map((tt) => String(tt.section_id || tt.section?.id || tt.sectionId?.id || (typeof tt.section === 'string' ? tt.section : "")));
+
+                  return sections.length > 0
+                    ? sections.map((s) => {
+                        const isUsed = usedSectionIds.includes(String(s.id));
+                        return {
+                          value: s.id,
+                          label: isUsed
+                            ? `${s.name} (Already Assigned)`
+                            : s.name,
+                          disabled: isUsed,
+                        };
+                      })
+                    : [{ value: "", label: "No record found", disabled: true }];
+                })()}
+                disabled={!formData.classId}
+                placeholder="Select Section"
+              />
+            </div>
+          </div>
+
+          {/* Periods */}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <Label className="text-lg font-semibold">Periods</Label>
+              <Button type="button" onClick={addPeriod} size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Period
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              {formData.periods.map((period, index) => (
+                <Card key={index}>
+                  <CardContent className="pt-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                      <div className="space-y-2">
+                        <Label>Day</Label>
+                        <Dropdown
+                          value={period.day}
+                          onChange={(e) =>
+                            updatePeriod(index, "day", e.target.value)
+                          }
+                          options={["All Days", ...DAYS].map((day) => ({ value: day, label: day }))}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Start Time</Label>
+                        <TimePicker
+                          value={period.startTime}
+                          onChange={(val) =>
+                            updatePeriod(index, "startTime", val)
+                          }
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>End Time</Label>
+                        <TimePicker
+                          value={period.endTime}
+                          onChange={(val) =>
+                            updatePeriod(index, "endTime", val)
+                          }
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Subject</Label>
+                        <Dropdown
+                          value={period.subjectId}
+                          onChange={(e) =>
+                            updatePeriod(index, "subjectId", e.target.value)
+                          }
+                          options={[
+                            { value: "", label: "None" },
+                            ...classSubjects.map((s) => ({
+                              value: s.id,
+                              label: s.is_applicable_for_all_groups ? `${s.name} (All Group)` : s.name,
+                            })),
+                          ]}
+                          placeholder="Select subject"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Teacher</Label>
+                        <Dropdown
+                          value={period.teacherId}
+                          onChange={(e) =>
+                            updatePeriod(index, "teacherId", e.target.value)
+                          }
+                          options={[
+                            { value: "", label: "None" },
+                            ...getAvailableTeachers(
+                              period.day,
+                              period.startTime,
+                              period.endTime,
+                              index,
+                              period.teacherId,
+                              period.subjectId
+                            ).map((t) => ({
+                              value: t.value,
+                              label: t.label,
+                              disabled: t.disabled,
+                            })),
+                          ]}
+                          placeholder="Select teacher"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Room Number</Label>
+                        <Input
+                          value={period.roomNumber}
+                          onChange={(e) =>
+                            updatePeriod(index, "roomNumber", e.target.value)
+                          }
+                          placeholder="e.g., 101, Lab A"
+                        />
+                      </div>
+
+                      <div className="flex items-end">
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          onClick={() => removePeriod(index)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+          <div className="h-40"></div>
+        </form>
+      </Modal>
+
+      <SimpleTimetableViewModal
+        isOpen={!!viewingTimetable}
+        onClose={() => setViewingTimetable(null)}
+        timetable={viewingTimetable}
+        teachers={teachers}
+        subjects={allSubjects}
+      />
+
+      {showDeleteModal && (
+        <ConfirmDeleteModal
+          title="Delete Timetable"
+          message="Are you sure you want to permanently delete this timetable? This action cannot be undone."
+          onConfirm={confirmDelete}
+          onCancel={() => {
+            setShowDeleteModal(false);
+            setTimetableToDelete(null);
+          }}
+        />
+      )}
+        </>
+      )}
+    </div>
+  );
+}
