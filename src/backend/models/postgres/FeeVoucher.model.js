@@ -12,7 +12,6 @@ const FeeVoucher = sequelize.define(
     voucher_no: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
     },
     student_id: {
       type: DataTypes.UUID,
@@ -96,6 +95,12 @@ const FeeVoucher = sequelize.define(
     timestamps: true,
     underscored: true,
     paranoid: true,
+    indexes: [
+      { unique: true, fields: ["voucher_no"] },
+      { fields: ["student_id"] },
+      { fields: ["branch_id"] },
+      { fields: ["status"] },
+    ],
   }
 );
 

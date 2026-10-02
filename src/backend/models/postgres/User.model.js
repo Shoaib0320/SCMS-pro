@@ -24,7 +24,6 @@ const User = sequelize.define(
       ),
       allowNull: false,
       defaultValue: "STUDENT",
-      comment: "SUPER_ADMIN = owner, BRANCH_ADMIN = branch manager",
     },
 
     // Optional sub-type for STAFF
@@ -39,7 +38,6 @@ const User = sequelize.define(
     email: {
       type: DataTypes.STRING,
       allowNull: true,
-      unique: true,
       validate: {
         isEmail: {
           msg: "Please enter a valid email address",
@@ -61,7 +59,7 @@ const User = sequelize.define(
     // Student login credential
     registration_no: {
       type: DataTypes.STRING(50),
-      unique: true,
+      allowNull: true,
       comment: "For STUDENT login",
     },
 
@@ -170,9 +168,9 @@ const User = sequelize.define(
     },
     indexes: [
       { fields: ["role"] },
-      { fields: ["email"] },
+      { unique: true, fields: ["email"] },
       { fields: ["phone"] },
-      { fields: ["registration_no"] },
+      { unique: true, fields: ["registration_no"] },
       { fields: ["branch_id"] }, // ✅ index on branch_id
     ],
   },

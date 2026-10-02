@@ -56,7 +56,6 @@ const Expense = sequelize.define('Expense', {
   expense_number: {
     type: DataTypes.STRING(50),
     allowNull: false,
-    unique: true,
     comment: 'Auto-generated expense number like EXP-2026-00001',
   },
   created_by: {
@@ -111,7 +110,7 @@ const Expense = sequelize.define('Expense', {
     { fields: ['category'] },
     { fields: ['status'] },
     { fields: ['date'] },
-    { fields: ['branch_id'] },
+    { unique: true, fields: ['expense_number'] },
   ],
 });
 

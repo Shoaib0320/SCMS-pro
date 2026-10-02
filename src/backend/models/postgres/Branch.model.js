@@ -21,7 +21,6 @@ const Branch = sequelize.define(
     code: {
       type: DataTypes.STRING(20),
       allowNull: false,
-      unique: true,
       uppercase: true,
       validate: {
         notEmpty: { msg: "Branch code is required" },
@@ -104,7 +103,7 @@ const Branch = sequelize.define(
     underscored: true,
     paranoid: true, // soft delete (deleted_at)
     indexes: [
-      { fields: ["code"] },
+      { unique: true, fields: ["code"] },
       { fields: ["is_active"] },
       { fields: ["admin_id"] },
     ],
