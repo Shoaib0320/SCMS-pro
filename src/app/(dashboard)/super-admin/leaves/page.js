@@ -12,8 +12,24 @@ import { Badge } from '@/components/ui/badge';
 import Modal from '@/components/ui/modal';
 import apiClient from '@/lib/api-client';
 import { toast } from 'sonner';
-import { CheckCircle, XCircle, Clock, UserPlus, Calendar } from 'lucide-react';
+import { 
+  CheckCircle, 
+  XCircle, 
+  Clock, 
+  UserPlus, 
+  Calendar, 
+  Building2, 
+  FileText, 
+  FilterX, 
+  Users, 
+  UserCheck, 
+  AlertCircle,
+  RefreshCw
+} from 'lucide-react';
 import ButtonLoader from '@/components/ui/button-loader';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
+import StatsCard from '@/components/dashboard/StatsCard';
+import { cn } from '@/lib/utils';
 
 export default function SuperAdminLeavesPage() {
   const { user } = useAuth();
@@ -57,7 +73,6 @@ export default function SuperAdminLeavesPage() {
     }
   }, [formBranch, userType]);
 
-
   const fetchBranches = async () => {
     try {
       const response = await apiClient.get('/api/super-admin/branches');
@@ -91,14 +106,12 @@ export default function SuperAdminLeavesPage() {
         const response = await apiClient.get('/api/users/staff', { branchId: branchId, allStaff: 'true' });
         setStudents(response.data?.staff || response.data || response || []);
       }
-
     } catch (error) {
       toast.error(`Failed to load ${type}s`);
     } finally {
       setLoadingStudents(false);
     }
   };
-
 
   const filterLeavesData = () => {
     let updated = [...leaves];
@@ -158,50 +171,86 @@ export default function SuperAdminLeavesPage() {
     }
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'APPROVED':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'REJECTED':
-        return <XCircle className="h-4 w-4 text-red-500" />;
-      default:
-        return <Clock className="h-4 w-4 text-yellow-500" />;
-    }
+  const handleClearFilters = () => {
+    setSelectedBranch('');
+    setStatusFilter('ALL');
   };
+
+  const hasActiveFilters = Boolean(selectedBranch || statusFilter !== 'ALL');
+
+  const pendingCount = leaves.filter(l => l.status === 'PENDING').length;
+  const approvedCount = leaves.filter(l => l.status === 'APPROVED').length;
+  const rejectedCount = leaves.filter(l => l.status === 'REJECTED').length;
 
   const getStatusBadge = (status) => {
     switch (status) {
       case 'APPROVED':
-        return <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Approved</Badge>;
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/40';
       case 'REJECTED':
-        return <Badge className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">Rejected</Badge>;
+        return 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800/40';
       default:
-        return <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">Pending</Badge>;
+        return 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800/40';
     }
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Student Leave Requests</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage leave requests and record bulk student leaves safely.</p>
-        </div>
-        <Button onClick={() => setIsModalOpen(true)} className="shadow-md">
-          <UserPlus className="h-4 w-4 mr-2" />
-          Manual Mark Leave
+    <div className="space-y-4">
+      {/* Header */}
+      <DashboardHeader
+        title="Leave Management"
+        subtitle="Manage and process student and staff leave requests across all branches"
+        onRefresh={fetchLeaves}
+      >
+        <Button 
+          onClick={() => setIsModalOpen(true)}
+          size="sm"
+          className="h-8 px-3 rounded-lg text-xs font-semibold gap-1.5 shadow-xs"
+        >
+          <UserPlus className="w-3.5 h-3.5" />
+          <span>Manual Mark Leave</span>
         </Button>
+      </DashboardHeader>
+
+      {/* Summary KPI Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5">
+        <StatsCard 
+          title="Total Requests"
+          value={leaves.length.toString()}
+          icon={FileText}
+          description="Consolidated across all branches"
+          color="blue"
+        />
+        <StatsCard 
+          title="Pending Review"
+          value={pendingCount.toString()}
+          icon={Clock}
+          description="Awaiting admin approval"
+          color="yellow"
+        />
+        <StatsCard 
+          title="Approved Leaves"
+          value={approvedCount.toString()}
+          icon={CheckCircle}
+          description="Authorized time off records"
+          color="green"
+        />
+        <StatsCard 
+          title="Rejected"
+          value={rejectedCount.toString()}
+          icon={XCircle}
+          description="Denied leave applications"
+          color="red"
+        />
       </div>
 
-      {/* Filters */}
-      <Card className="shadow-sm">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-semibold">Filters</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <Label>Branch</Label>
+      {/* Filter Toolbar */}
+      <Card className="border border-border bg-card shadow-xs">
+        <CardContent className="p-3 sm:p-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 items-center">
+            <div>
+              <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                <Building2 className="w-3.5 h-3.5 text-primary" /> Branch Scope
+              </label>
               <Dropdown
                 name="branch"
                 value={selectedBranch}
@@ -210,79 +259,120 @@ export default function SuperAdminLeavesPage() {
                   { value: '', label: 'All Branches' },
                   ...branches.map(b => ({ value: b.id || b._id, label: b.name }))
                 ]}
-                placeholder="Filter by Branch"
+                placeholder="Choose Branch"
+                className="w-full text-xs"
               />
             </div>
-            <div className="space-y-1">
-              <Label>Status</Label>
-              <Dropdown
-                name="status"
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                options={[
-                  { value: 'ALL', label: 'All Statuses' },
-                  { value: 'PENDING', label: 'Pending' },
-                  { value: 'APPROVED', label: 'Approved' },
-                  { value: 'REJECTED', label: 'Rejected' },
-                ]}
-              />
+
+            <div>
+              <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                <AlertCircle className="w-3.5 h-3.5 text-primary" /> Status Filter
+              </label>
+              <div className="flex gap-2 items-center">
+                <Dropdown
+                  name="status"
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  options={[
+                    { value: 'ALL', label: 'All Statuses' },
+                    { value: 'PENDING', label: 'Pending Only' },
+                    { value: 'APPROVED', label: 'Approved Only' },
+                    { value: 'REJECTED', label: 'Rejected Only' },
+                  ]}
+                  className="w-full text-xs flex-1"
+                />
+                {hasActiveFilters && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleClearFilters}
+                    className="h-9 px-2.5 rounded-lg border-border hover:bg-secondary text-xs flex-shrink-0"
+                    title="Clear Filters"
+                  >
+                    <FilterX className="w-3.5 h-3.5" />
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            <div className="hidden lg:col-span-2 lg:flex items-center justify-end text-xs text-muted-foreground font-medium pr-2">
+              Showing {filteredLeaves.length} of {leaves.length} records
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Data Table */}
-      <Card className="shadow-md border-0 overflow-hidden">
+      <Card className="border border-border bg-card shadow-xs overflow-hidden">
+        <CardHeader className="p-3.5 sm:p-4 pb-2 border-b border-border/50 flex flex-row items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                <FileText className="w-3.5 h-3.5" />
+              </div>
+              Leave Requests Log
+            </CardTitle>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-secondary text-secondary-foreground border border-border">
+              {filteredLeaves.length} records
+            </span>
+          </div>
+        </CardHeader>
         <CardContent className="p-0">
           {loading ? (
             <div className="py-12 flex justify-center">
               <ButtonLoader />
             </div>
           ) : filteredLeaves.length === 0 ? (
-            <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-              No leave requests found matching the filters.
+            <div className="text-center py-12 text-muted-foreground">
+              <FileText className="w-10 h-10 mx-auto mb-2 opacity-30 text-muted-foreground" />
+              <p className="text-xs font-semibold text-foreground">No leave requests found</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">Try adjusting your filters or register a manual leave</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <Table>
-                <TableHeader className="bg-gray-50 dark:bg-gray-800/50">
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-
-                    <TableHead>Reg No.</TableHead>
-                    <TableHead>Date Range</TableHead>
-                    <TableHead>Reason</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                <TableHeader>
+                  <TableRow className="bg-muted/40 hover:bg-muted/40">
+                    <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground h-9 px-3">Applicant Name</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground h-9 px-3">Reg #</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground h-9 px-3">Date Range</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground h-9 px-3">Reason</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground h-9 px-3">Status</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground h-9 px-3 text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredLeaves.map((leave) => (
-                    <TableRow key={leave.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-900/20">
-                      <TableCell className="font-medium">
-                        {leave.student ? `${leave.student.first_name} ${leave.student.last_name}` : 'Unknown Student'}
+                    <TableRow key={leave.id} className="hover:bg-muted/30 transition-colors">
+                      <TableCell className="px-3 py-2.5 font-medium text-xs text-foreground">
+                        {leave.student ? `${leave.student.first_name} ${leave.student.last_name}` : 'Unknown Applicant'}
                       </TableCell>
-                      <TableCell>{leave.student?.registration_no || 'N/A'}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Calendar className="h-3 w-3 text-gray-400" />
+                      <TableCell className="px-3 py-2.5">
+                        <span className="font-mono text-xs font-semibold text-muted-foreground bg-secondary/80 border border-border/60 px-1.5 py-0.5 rounded">
+                          {leave.student?.registration_no || '—'}
+                        </span>
+                      </TableCell>
+                      <TableCell className="px-3 py-2.5 text-xs text-muted-foreground whitespace-nowrap">
+                        <div className="flex items-center gap-1.5 font-medium">
+                          <Calendar className="h-3.5 w-3.5 text-primary" />
                           <span>{leave.start_date} to {leave.end_date}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="max-w-xs truncate">{leave.reason || 'No reason provided'}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          {getStatusIcon(leave.status)}
-                          {getStatusBadge(leave.status)}
-                        </div>
+                      <TableCell className="px-3 py-2.5 text-xs text-muted-foreground max-w-xs truncate" title={leave.reason}>
+                        {leave.reason || 'No reason provided'}
                       </TableCell>
-                      <TableCell className="text-right">
-                        {leave.status === 'PENDING' && (
-                          <div className="flex justify-end gap-2">
+                      <TableCell className="px-3 py-2.5 whitespace-nowrap">
+                        <span className={cn("inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border capitalize", getStatusBadge(leave.status))}>
+                          {leave.status?.toLowerCase()}
+                        </span>
+                      </TableCell>
+                      <TableCell className="px-3 py-2.5 text-right whitespace-nowrap">
+                        {leave.status === 'PENDING' ? (
+                          <div className="flex justify-end gap-1.5">
                             <Button
                               size="sm"
                               variant="outline"
-                              className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200"
+                              className="h-7 px-2.5 rounded-md text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800/40"
                               onClick={() => handleStatusUpdate(leave.id, 'APPROVED')}
                             >
                               Approve
@@ -290,12 +380,14 @@ export default function SuperAdminLeavesPage() {
                             <Button
                               size="sm"
                               variant="outline"
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                              className="h-7 px-2.5 rounded-md text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 border-rose-200 dark:border-rose-800/40"
                               onClick={() => handleStatusUpdate(leave.id, 'REJECTED')}
                             >
                               Reject
                             </Button>
                           </div>
+                        ) : (
+                          <span className="text-[11px] text-muted-foreground font-medium">Processed</span>
                         )}
                       </TableCell>
                     </TableRow>
@@ -312,12 +404,21 @@ export default function SuperAdminLeavesPage() {
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title="Manual Leave Registration"
-
         size="md"
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" size="sm" className="rounded-lg text-xs" onClick={() => setIsModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button size="sm" className="rounded-lg text-xs font-semibold" onClick={handleCreateLeave} disabled={submitting}>
+              {submitting ? <ButtonLoader /> : 'Register Leave'}
+            </Button>
+          </div>
+        }
       >
-        <form onSubmit={handleCreateLeave} className="space-y-4 p-2">
-          <div className="space-y-1">
-            <Label>Branch *</Label>
+        <form onSubmit={handleCreateLeave} className="space-y-3.5">
+          <div>
+            <label className="block text-xs font-semibold text-foreground mb-1">Branch *</label>
             <Dropdown
               name="formBranch"
               value={formBranch}
@@ -328,8 +429,8 @@ export default function SuperAdminLeavesPage() {
             />
           </div>
 
-          <div className="space-y-1">
-            <Label>User Type *</Label>
+          <div>
+            <label className="block text-xs font-semibold text-foreground mb-1">User Type *</label>
             <Dropdown
               name="userType"
               value={userType}
@@ -346,8 +447,10 @@ export default function SuperAdminLeavesPage() {
             />
           </div>
 
-          <div className="space-y-1">
-            <Label>{userType === 'student' ? 'Student *' : 'Staff *'}</Label>
+          <div>
+            <label className="block text-xs font-semibold text-foreground mb-1">
+              {userType === 'student' ? 'Student *' : 'Staff *'}
+            </label>
             <Dropdown
               name="formStudent"
               value={formStudent}
@@ -358,7 +461,6 @@ export default function SuperAdminLeavesPage() {
                   ? 'Loading users...' 
                   : !formBranch 
                     ? `Select branch first` 
-
                     : students.length === 0 
                       ? `${branches.find(b => b.id === formBranch || b._id === formBranch)?.name || 'Branch'} ${userType === 'student' ? 'Students' : 'Staff'} Not Found` 
                       : userType === 'student' 
@@ -370,9 +472,9 @@ export default function SuperAdminLeavesPage() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <Label>Start Date *</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-foreground mb-1">Start Date *</label>
               <Input
                 type="date"
                 value={formStartDate}
@@ -380,8 +482,8 @@ export default function SuperAdminLeavesPage() {
                 required
               />
             </div>
-            <div className="space-y-1">
-              <Label>End Date *</Label>
+            <div>
+              <label className="block text-xs font-semibold text-foreground mb-1">End Date *</label>
               <Input
                 type="date"
                 value={formEndDate}
@@ -391,20 +493,13 @@ export default function SuperAdminLeavesPage() {
             </div>
           </div>
 
-          <div className="space-y-1">
-            <Label>Reason / Remarks</Label>
+          <div>
+            <label className="block text-xs font-semibold text-foreground mb-1">Reason / Remarks</label>
             <Input
-              placeholder="Write leave reason..."
+              placeholder="Write leave reason or remarks..."
               value={formReason}
               onChange={(e) => setFormReason(e.target.value)}
             />
-          </div>
-
-          <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>Cancel</Button>
-            <Button type="submit" disabled={submitting}>
-              {submitting ? <ButtonLoader /> : 'Register Leave'}
-            </Button>
           </div>
         </form>
       </Modal>

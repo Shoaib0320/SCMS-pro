@@ -45,6 +45,8 @@ import UserManagementTable from "@/components/common/UserManagementTable";
 import ConfirmDeleteModal from "@/components/modals/ConfirmDeleteModal";
 import UserDetailModal from "@/components/modals/UserDetailModal";
 import AdminChangeUserPasswordModal from "@/components/modals/AdminChangeUserPasswordModal";
+import StatsCard from "@/components/dashboard/StatsCard";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
 
 export default function AdministratorsPage() {
   const [admins, setAdmins] = useState([]);
@@ -468,114 +470,93 @@ export default function AdministratorsPage() {
 
   if (loading && admins.length === 0) {
     return (
-      <div className="p-4 sm:p-6 min-h-screen">
+      <div className="space-y-4">
         <AdminManagementSkeleton />
       </div>
     );
   }
 
   return (
-    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 sm:pt-8 gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
-            Administrators Management
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1 text-sm sm:text-base">
-            Manage system and branch administrators
-          </p>
-        </div>
+      <DashboardHeader
+        title="Administrators Management"
+        subtitle="Manage system and branch administrators across all locations"
+        onRefresh={loadAdmins}
+      >
+        <Button
+          onClick={handleAddNew}
+          size="sm"
+          className="h-8 px-3 text-xs font-semibold rounded-lg bg-primary hover:bg-primary-hover text-primary-foreground transition-colors cursor-pointer"
+        >
+          <Plus className="w-3.5 h-3.5 mr-1" />
+          Add Administrator
+        </Button>
+      </DashboardHeader>
+
+      {/* Stats Cards (Compact 4-column Grid matching Dashboard Overview) */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5">
+        <StatsCard 
+          title="Total Admins"
+          value={admins.length}
+          icon={UserCog}
+          description="Branch administrators"
+          color="blue"
+        />
+        <StatsCard 
+          title="Active Admins"
+          value={admins.filter((a) => a.is_active).length}
+          icon={CheckCircle}
+          description="Operational accounts"
+          color="green"
+        />
+        <StatsCard 
+          title="Inactive Admins"
+          value={admins.filter((a) => !a.is_active).length}
+          icon={XCircle}
+          description="Suspended / disabled"
+          color="red"
+        />
+        <StatsCard 
+          title="Assigned Branches"
+          value={admins.filter((a) => a.branch_id).length}
+          icon={Building2}
+          description="Campus allocations"
+          color="purple"
+        />
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Total Branch Admins</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {admins.length}
-                </p>
-              </div>
-              <UserCog className="h-8 w-8 text-blue-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Active</p>
-                <p className="text-2xl font-bold text-green-600">
-                  {admins.filter((a) => a.is_active).length}
-                </p>
-              </div>
-              <CheckCircle className="h-8 w-8 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Inactive</p>
-                <p className="text-2xl font-bold text-red-600">
-                  {admins.filter((a) => !a.is_active).length}
-                </p>
-              </div>
-              <XCircle className="h-8 w-8 text-red-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Assigned Branches</p>
-                <p className="text-2xl font-bold text-purple-600">
-                  {admins.filter((a) => a.branch_id).length}
-                </p>
-              </div>
-              <Building2 className="h-8 w-8 text-purple-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Search and Filters */}
-      <Card>
-        <CardContent className="p-4">
-          <Input
-            icon={Search}
+      {/* Compact Search & Actions Toolbar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 p-2.5 rounded-xl border border-border bg-card shadow-xs">
+        <div className="relative flex-1 max-w-md">
+          <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <input
             type="text"
             placeholder="Search by name, email, or phone..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            fullWidth={true}
+            className="w-full h-8 pl-8 pr-8 text-xs rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors"
           />
-        </CardContent>
-      </Card>
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          )}
+        </div>
 
-      {/* Administrators Table */}
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-            <CardTitle className="text-lg sm:text-xl">
-              All Administrators ({filteredAdmins.length})
-            </CardTitle>
-            <Button onClick={handleAddNew} className="w-full sm:w-auto">
-              <Plus className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Add Administrator</span>
-              <span className="sm:hidden">Add Admin</span>
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
+        <div className="text-right flex items-center justify-between sm:justify-end gap-2">
+          <span className="text-[11px] font-medium text-muted-foreground">
+            {filteredAdmins.length} {filteredAdmins.length === 1 ? 'administrator' : 'administrators'} listed
+          </span>
+        </div>
+      </div>
+
+      {/* Administrators Table Card */}
+      <Card className="border border-border bg-card shadow-xs overflow-hidden">
+        <CardContent className="p-0">
           <UserManagementTable
             data={filteredAdmins}
             loading={loading}

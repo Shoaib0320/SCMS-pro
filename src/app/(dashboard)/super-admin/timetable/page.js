@@ -30,7 +30,11 @@ import {
   Search,
   Filter,
   Building2,
+  CheckCircle2,
+  RotateCcw
 } from "lucide-react";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import StatsCard from "@/components/dashboard/StatsCard";
 import BranchSelect from "@/components/ui/branch-select";
 import ClassSelect from "@/components/ui/class-select";
 import apiClient from "@/lib/api-client";
@@ -1147,235 +1151,264 @@ export default function TimetablePage() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="space-y-4">
       {fetchingTimetables && timetables.length === 0 ? (
         <TimetableSkeleton />
       ) : (
         <>
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 pt-6 sm:pt-8">
-            <div className="space-y-1">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
-                Timetable Management
-              </h1>
-              <p className="text-muted-foreground text-sm sm:text-base">
-                Manage class timetables and periods
-              </p>
-            </div>
+          {/* Header */}
+          <DashboardHeader
+            title="Timetable Management"
+            subtitle="Manage class schedules, periods, and teacher assignments across branches"
+            onRefresh={() => fetchTimetables()}
+          />
+
+          {/* Stats Cards (Compact 4-column Grid) */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5">
+            <StatsCard 
+              title="Total Schedules"
+              value={timetables.length}
+              icon={Calendar}
+              description="Institutional timetables"
+              color="blue"
+            />
+            <StatsCard 
+              title="Campuses"
+              value={Object.keys(groupedTimetables).length}
+              icon={Building2}
+              description="Branches with schedule"
+              color="purple"
+            />
+            <StatsCard 
+              title="Active Schedules"
+              value={timetables.filter(t => t.status === "active").length}
+              icon={CheckCircle2}
+              description="Published schedules"
+              color="green"
+            />
+            <StatsCard 
+              title="Draft / Pending"
+              value={timetables.filter(t => t.status !== "active").length}
+              icon={Clock}
+              description="Unpublished drafts"
+              color="orange"
+            />
           </div>
 
-      {/* Filters */}
-      <Card className="border-none shadow-sm bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border border-slate-200 dark:border-slate-800">
-        <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-lg font-bold">
-              <Filter className="h-5 w-5 text-indigo-500" />
-              Advanced Filters
-            </CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setSelectedBranch("");
-                setSelectedClass("");
-                setSelectedSection("");
-                setSelectedTeacher("");
-                setSelectedAcademicYear("");
-                setClasses([]);
-                setSections([]);
-                setTeachers([]);
-                fetchTimetables();
-              }}
-              className="text-xs font-bold text-slate-500 hover:text-indigo-600 transition-colors"
-            >
-              Reset All
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-            <div className="space-y-2">
-              <Label className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
-                <Building2 className="h-3 w-3" />
-                Branch
-              </Label>
-              <BranchSelect
-                value={selectedBranch}
-                onChange={(e) => {
-                  const branchId = e.target.value;
-                  setSelectedBranch(branchId);
-                  setSelectedClass("");
-                  setSelectedSection("");
-                  setSelectedTeacher("");
-                  if (branchId) {
-                    fetchClasses(branchId);
-                    fetchTeachers(branchId);
-                    fetchAcademicYears(branchId);
-                  }
-                }}
-                branches={branches}
-              />
-            </div>
+          {/* Compact Filters Toolbar */}
+          <Card className="border border-border bg-card shadow-xs">
+            <CardContent className="p-3 sm:p-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
+                <div className="space-y-1">
+                  <Label className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5">
+                    <Building2 className="h-3 w-3" />
+                    Branch
+                  </Label>
+                  <BranchSelect
+                    value={selectedBranch}
+                    onChange={(e) => {
+                      const branchId = e.target.value;
+                      setSelectedBranch(branchId);
+                      setSelectedClass("");
+                      setSelectedSection("");
+                      setSelectedTeacher("");
+                      if (branchId) {
+                        fetchClasses(branchId);
+                        fetchTeachers(branchId);
+                        fetchAcademicYears(branchId);
+                      }
+                    }}
+                    branches={branches}
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
-                <BookOpen className="h-3 w-3" />
-                Class
-              </Label>
-              <ClassSelect
-                value={selectedClass}
-                onChange={(e) => {
-                  const classId = e.target.value;
-                  setSelectedClass(classId);
-                  setSelectedSection("");
-                  if (classId) {
-                    fetchSections(classId);
-                  } else {
-                    setSections([]);
-                  }
-                }}
-                classes={classes}
-                placeholder="All Classes"
-                className="w-full bg-white dark:bg-slate-950 font-medium"
-                disabled={!selectedBranch}
-              />
-            </div>
+                <div className="space-y-1">
+                  <Label className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5">
+                    <BookOpen className="h-3 w-3" />
+                    Class
+                  </Label>
+                  <ClassSelect
+                    value={selectedClass}
+                    onChange={(e) => {
+                      const classId = e.target.value;
+                      setSelectedClass(classId);
+                      setSelectedSection("");
+                      if (classId) {
+                        fetchSections(classId);
+                      } else {
+                        setSections([]);
+                      }
+                    }}
+                    classes={classes}
+                    placeholder="All Classes"
+                    className="w-full bg-background font-normal text-xs h-8"
+                    disabled={!selectedBranch}
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
-                <Users className="h-3 w-3" />
-                Section
-              </Label>
-              <Dropdown
-                value={selectedSection}
-                onChange={(e) => setSelectedSection(e.target.value)}
-                options={[
-                  { value: "", label: "All Sections" },
-                  ...sections.map((s) => ({
-                    value: s.name,
-                    label: `${s.name} ${s.roomNumber ? `(Room: ${s.roomNumber})` : ""}`,
-                  })),
-                ]}
-                placeholder="All Sections"
-                disabled={!selectedClass}
-                className="bg-white dark:bg-slate-950 font-medium"
-              />
-            </div>
+                <div className="space-y-1">
+                  <Label className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5">
+                    <Users className="h-3 w-3" />
+                    Section
+                  </Label>
+                  <Dropdown
+                    value={selectedSection}
+                    onChange={(e) => setSelectedSection(e.target.value)}
+                    options={[
+                      { value: "", label: "All Sections" },
+                      ...sections.map((s) => ({
+                        value: s.name,
+                        label: `${s.name} ${s.roomNumber ? `(Room: ${s.roomNumber})` : ""}`,
+                      })),
+                    ]}
+                    placeholder="All Sections"
+                    disabled={!selectedClass}
+                    className="bg-background font-normal text-xs h-8"
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
-                <User className="h-3 w-3" />
-                Teacher
-              </Label>
-              <Dropdown
-                value={selectedTeacher}
-                onChange={(e) => setSelectedTeacher(e.target.value)}
-                options={[
-                  { value: "", label: "All Teachers" },
-                  ...teachers.map((t) => ({
-                    value: t.id,
-                    label: `${t.first_name} ${t.last_name}`,
-                  })),
-                ]}
-                placeholder="All Teachers"
-                disabled={!selectedBranch}
-                className="bg-white dark:bg-slate-950 font-medium"
-              />
-            </div>
+                <div className="space-y-1">
+                  <Label className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5">
+                    <User className="h-3 w-3" />
+                    Teacher
+                  </Label>
+                  <Dropdown
+                    value={selectedTeacher}
+                    onChange={(e) => setSelectedTeacher(e.target.value)}
+                    options={[
+                      { value: "", label: "All Teachers" },
+                      ...teachers.map((t) => ({
+                        value: t.id,
+                        label: `${t.first_name} ${t.last_name}`,
+                      })),
+                    ]}
+                    placeholder="All Teachers"
+                    disabled={!selectedBranch}
+                    className="bg-background font-normal text-xs h-8"
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
-                <Calendar className="h-3 w-3" />
-                Academic Year
-              </Label>
-              <Dropdown
-                value={selectedAcademicYear}
-                onChange={(e) => setSelectedAcademicYear(e.target.value)}
-                options={[
-                  { value: "", label: "All Years" },
-                  ...academicYears.map((year) => ({
-                    value: year.id,
-                    label: year.name,
-                  })),
-                ]}
-                placeholder="Select Academic Year"
-                disabled={!selectedBranch}
-                className="bg-white dark:bg-slate-950 font-medium"
-              />
-            </div>
-          </div>
+                <div className="space-y-1">
+                  <Label className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5">
+                    <Calendar className="h-3 w-3" />
+                    Academic Year
+                  </Label>
+                  <Dropdown
+                    value={selectedAcademicYear}
+                    onChange={(e) => setSelectedAcademicYear(e.target.value)}
+                    options={[
+                      { value: "", label: "All Years" },
+                      ...academicYears.map((year) => ({
+                        value: year.id,
+                        label: year.name,
+                      })),
+                    ]}
+                    placeholder="Select Academic Year"
+                    disabled={!selectedBranch}
+                    className="bg-background font-normal text-xs h-8"
+                  />
+                </div>
+              </div>
 
-          <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">
-            <Button
-              onClick={() => fetchTimetables()}
-              className="px-8 font-bold shadow-lg shadow-indigo-500/20 bg-indigo-600 hover:bg-indigo-700 transition-all"
-              disabled={fetchingTimetables}
-            >
-              {fetchingTimetables ? (
+              {/* Filter Action Bar */}
+              <div className="mt-3 pt-2.5 border-t border-border flex items-center justify-between">
+                <span className="text-[11px] text-muted-foreground font-medium">
+                  {timetables.length} schedules found
+                </span>
                 <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  <span>Searching...</span>
+                  {(selectedBranch || selectedClass || selectedSection || selectedTeacher || selectedAcademicYear) && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedBranch("");
+                        setSelectedClass("");
+                        setSelectedSection("");
+                        setSelectedTeacher("");
+                        setSelectedAcademicYear("");
+                        setClasses([]);
+                        setSections([]);
+                        setTeachers([]);
+                        fetchTimetables();
+                      }}
+                      className="h-7 px-2.5 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+                    >
+                      <RotateCcw className="w-3 h-3 mr-1" />
+                      Reset
+                    </Button>
+                  )}
+                  <Button
+                    onClick={() => fetchTimetables()}
+                    size="sm"
+                    className="h-7 px-3 text-xs font-semibold bg-primary hover:bg-primary-hover text-primary-foreground cursor-pointer"
+                    disabled={fetchingTimetables}
+                  >
+                    {fetchingTimetables ? (
+                      <div className="flex items-center gap-1.5">
+                        <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        <span>Searching...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <Search className="mr-1.5 h-3 w-3" />
+                        Apply Filters
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Timetables List Card */}
+          <Card className="border border-border bg-card shadow-xs overflow-hidden">
+            <CardHeader className="border-b border-border py-3 px-4 sm:px-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-base font-bold text-foreground">
+                    Timetables Management
+                  </CardTitle>
+                  <CardDescription className="text-xs mt-0.5">
+                    {timetables.length} active schedules across all branches
+                  </CardDescription>
+                </div>
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Calendar className="h-4 w-4" />
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              {fetchingTimetables ? (
+                <div className="p-5">
+                  <TimetableGridSkeleton />
                 </div>
               ) : (
-                <>
-                  <Search className="mr-2 h-4 w-4" />
-                  Apply Filters
-                </>
-              )}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+                <div className="overflow-x-auto">
+                  {viewMode === "grouped" ? (
+                    <div className="space-y-6 p-4 sm:p-5">
+                    {Object.entries(groupedTimetables).map(
+                      ([branchId, branchData]) => (
+                        <div key={branchId} className="space-y-3">
+                          <div className="flex items-center gap-3 border-b border-border pb-2">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                              <Building2 className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <h3 className="text-sm font-bold text-foreground uppercase tracking-tight">
+                                {branchData.name}
+                              </h3>
+                              <p className="text-[11px] text-muted-foreground font-medium">
+                                {branchData.timetables.length} schedules found for this campus
+                              </p>
+                            </div>
+                          </div>
 
-      {/* Timetables List */}
-      <Card className="border-none shadow-xl bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm overflow-hidden">
-        <CardHeader className="border-b border-gray-100 dark:border-gray-800 pb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
-                Timetables Management
-              </CardTitle>
-              <CardDescription className="mt-1">
-                {timetables.length} active schedules across all branches
-              </CardDescription>
-            </div>
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
-              <Calendar className="h-6 w-6" />
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          {fetchingTimetables ? (
-            <div className="p-6">
-              <TimetableGridSkeleton />
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              {viewMode === "grouped" ? (
-                <div className="space-y-8 p-6">
-                {Object.entries(groupedTimetables).map(
-                  ([branchId, branchData]) => (
-                    <div key={branchId} className="space-y-4">
-                      <div className="flex items-center gap-4 border-b border-gray-100 dark:border-gray-800 pb-2">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-200 dark:shadow-none">
-                          <Search className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-bold text-gray-900 dark:text-white uppercase tracking-tight">
-                            {branchData.name}
-                          </h3>
-                          <p className="text-xs text-gray-500 font-medium">
-                            {branchData.timetables.length} schedules found for
-                            this campus
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {branchData.timetables.map((tt) => (
-                          <div
-                            key={tt.id}
-                            className="group relative bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
-                          >
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {branchData.timetables.map((tt) => (
+                              <div
+                                key={tt.id}
+                                className="group relative bg-card border border-border rounded-xl p-3.5 hover:shadow-xs hover:border-primary/40 transition-all"
+                              >
                             <div className="flex justify-between items-start mb-4">
                               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400 group-hover:scale-110 transition-transform">
                                 <BookOpen className="h-5 w-5" />

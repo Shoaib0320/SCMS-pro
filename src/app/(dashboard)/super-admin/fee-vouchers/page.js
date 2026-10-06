@@ -23,7 +23,8 @@ import { toast } from 'sonner';
 import { generateFeeVoucherPDF, generateFeeReceiptPDF } from '@/lib/pdf-generator';
 import ConfirmDeleteModal from '@/components/modals/ConfirmDeleteModal';
 import SearchableStudentSelect from '@/components/ui/searchable-student-select';
-import { getActiveAcademicYear } from '@/lib/utils';
+import { getActiveAcademicYear, cn } from '@/lib/utils';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
 
 const MONTHS = [
   { value: '1', label: 'January' },
@@ -53,13 +54,13 @@ const ITEMS_PER_PAGE = 10;
 
 const getStatusBadge = (status) => {
   const badges = {
-    pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-    paid: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-    partial: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-    overdue: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-    cancelled: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400',
+    pending: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800/40',
+    paid: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/40',
+    partial: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800/40',
+    overdue: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800/40',
+    cancelled: 'bg-secondary text-secondary-foreground border-border',
   };
-  return badges[status] || badges.pending;
+  return badges[status?.toLowerCase()] || badges.pending;
 };
 
 export default function SuperAdminFeeVouchersPage() {
@@ -708,8 +709,9 @@ export default function SuperAdminFeeVouchersPage() {
     if (displayVouchers.length === 0) {
       return (
         <div className="text-center py-12 text-muted-foreground">
-          <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
-          <p>No vouchers found</p>
+          <FileText className="w-10 h-10 mx-auto mb-2 opacity-30 text-muted-foreground" />
+          <p className="text-xs font-semibold text-foreground">No vouchers found</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Try adjusting filters or generate new fee vouchers</p>
         </div>
       );
     }
@@ -719,36 +721,36 @@ export default function SuperAdminFeeVouchersPage() {
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Voucher Info</TableHead>
-                <TableHead>Student</TableHead>
-                <TableHead>Month/Year</TableHead>
-                <TableHead>Due Date</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-                <TableHead className="text-right">Paid</TableHead>
-                <TableHead className="text-right">Remaining</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
+              <TableRow className="bg-muted/40 hover:bg-muted/40">
+                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground h-9 px-3">Voucher Info</TableHead>
+                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground h-9 px-3">Student</TableHead>
+                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground h-9 px-3">Month / Year</TableHead>
+                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground h-9 px-3">Due Date</TableHead>
+                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground h-9 px-3 text-right">Total</TableHead>
+                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground h-9 px-3 text-right">Paid</TableHead>
+                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground h-9 px-3 text-right">Remaining</TableHead>
+                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground h-9 px-3">Status</TableHead>
+                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground h-9 px-3 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i}>
-                    <TableCell><Skeleton className="h-10 w-24" /></TableCell>
-                    <TableCell><Skeleton className="h-10 w-40" /></TableCell>
-                    <TableCell><Skeleton className="h-6 w-20" /></TableCell>
-                    <TableCell><Skeleton className="h-6 w-24" /></TableCell>
-                    <TableCell><Skeleton className="h-6 w-16 float-right" /></TableCell>
-                    <TableCell><Skeleton className="h-6 w-16 float-right" /></TableCell>
-                    <TableCell><Skeleton className="h-6 w-16 float-right" /></TableCell>
-                    <TableCell><Skeleton className="h-6 w-16" /></TableCell>
-                    <TableCell><Skeleton className="h-8 w-24" /></TableCell>
+                    <TableCell className="px-3 py-2.5"><Skeleton className="h-8 w-24 rounded" /></TableCell>
+                    <TableCell className="px-3 py-2.5"><Skeleton className="h-8 w-36 rounded" /></TableCell>
+                    <TableCell className="px-3 py-2.5"><Skeleton className="h-5 w-20 rounded" /></TableCell>
+                    <TableCell className="px-3 py-2.5"><Skeleton className="h-5 w-24 rounded" /></TableCell>
+                    <TableCell className="px-3 py-2.5"><Skeleton className="h-5 w-16 rounded ml-auto" /></TableCell>
+                    <TableCell className="px-3 py-2.5"><Skeleton className="h-5 w-16 rounded ml-auto" /></TableCell>
+                    <TableCell className="px-3 py-2.5"><Skeleton className="h-5 w-16 rounded ml-auto" /></TableCell>
+                    <TableCell className="px-3 py-2.5"><Skeleton className="h-5 w-16 rounded" /></TableCell>
+                    <TableCell className="px-3 py-2.5"><Skeleton className="h-7 w-24 rounded ml-auto" /></TableCell>
                   </TableRow>
                 ))
               ) : displayVouchers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-10 text-gray-500 font-medium">
+                  <TableCell colSpan={9} className="text-center py-10 text-muted-foreground text-xs font-medium">
                     No vouchers found for this category.
                   </TableCell>
                 </TableRow>
@@ -765,67 +767,107 @@ export default function SuperAdminFeeVouchersPage() {
                   const daysOverdue = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
                   return (
-                    <TableRow key={voucher.id || voucher._id}>
-                      <TableCell>
-                        <div className="font-bold text-blue-600">{voucher.voucherNumber}</div>
-                        <div className="text-[10px] text-gray-400 uppercase tracking-tighter">
+                    <TableRow key={voucher.id || voucher._id} className="hover:bg-muted/30 transition-colors">
+                      <TableCell className="px-3 py-2.5">
+                        <div className="font-mono text-xs font-semibold text-primary bg-primary/10 border border-primary/20 px-1.5 py-0.5 rounded w-fit">
+                          {voucher.voucherNumber}
+                        </div>
+                        <div className="text-[10px] text-muted-foreground mt-0.5">
                           {new Date(voucher.createdAt).toLocaleDateString()}
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="px-3 py-2.5">
                         <div className="flex flex-col">
-                          <div className="font-medium">{name}</div>
-                          <div className="text-[10px] text-gray-500 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded w-fit mt-1">
-                            GR: {rollNumber} | Reg: {registrationNumber}
+                          <span className="font-semibold text-xs text-foreground truncate max-w-[160px]">{name}</span>
+                          <div className="text-[10px] text-muted-foreground bg-secondary/80 border border-border/60 px-1.5 py-0.2 rounded w-fit mt-0.5">
+                            GR: {rollNumber} • Reg: {registrationNumber}
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>{MONTHS.find(m => m.value === voucher.month?.toString())?.label} {voucher.year}</TableCell>
-                      <TableCell>
-                        <div className={tabKey === 'overdue' ? 'text-red-600 font-medium' : ''}>
+                      <TableCell className="px-3 py-2.5 text-xs text-muted-foreground whitespace-nowrap">
+                        {MONTHS.find(m => m.value === voucher.month?.toString())?.label} {voucher.year}
+                      </TableCell>
+                      <TableCell className="px-3 py-2.5 whitespace-nowrap">
+                        <div className={cn("text-xs font-medium", tabKey === 'overdue' ? 'text-rose-600 dark:text-rose-400 font-semibold' : 'text-foreground')}>
                           {new Date(voucher.dueDate).toLocaleDateString('en-PK')}
                         </div>
                         {tabKey === 'overdue' && (
-                          <div className="text-[10px] text-red-500 font-bold bg-red-50 dark:bg-red-900/20 px-1.5 py-0.5 rounded mt-1">
-                            {daysOverdue} days overdue
+                          <div className="text-[10px] text-rose-600 dark:text-rose-400 font-semibold bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/40 px-1.5 py-0.2 rounded w-fit mt-0.5">
+                            {daysOverdue}d overdue
                           </div>
                         )}
                       </TableCell>
-                      <TableCell className="text-right font-bold text-gray-900 dark:text-white">
+                      <TableCell className="px-3 py-2.5 text-right font-bold text-xs text-foreground whitespace-nowrap">
                         PKR {(voucher.totalAmount || 0).toLocaleString()}
                       </TableCell>
-                      <TableCell className="text-right font-bold text-green-600">
+                      <TableCell className="px-3 py-2.5 text-right font-bold text-xs text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
                         PKR {(voucher.paidAmount ?? voucher.paid_amount ?? 0).toLocaleString()}
                       </TableCell>
-                      <TableCell className="text-right font-bold text-blue-600">
+                      <TableCell className="px-3 py-2.5 text-right font-bold text-xs text-blue-600 dark:text-blue-400 whitespace-nowrap">
                         PKR {(voucher.remainingAmount ?? (Number(voucher.totalAmount ?? voucher.amount_due ?? 0) + Number(voucher.fineAmount ?? voucher.fine_amount ?? 0) - Number(voucher.paidAmount ?? voucher.paid_amount ?? 0))).toLocaleString()}
                       </TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getStatusBadge(voucher.status)}`}>
+                      <TableCell className="px-3 py-2.5 whitespace-nowrap">
+                        <span className={cn("inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border capitalize", getStatusBadge(voucher.status))}>
                           {voucher.status}
                         </span>
                       </TableCell>
-                      <TableCell>
-                        <div className="flex gap-1 justify-end">
-                          <Button variant="ghost" size="icon-sm" title="View" onClick={() => handleViewVoucher(voucher.id || voucher._id)}>
-                            <Eye className="w-4 h-4 text-blue-500" />
+                      <TableCell className="px-3 py-2.5 text-right whitespace-nowrap">
+                        <div className="flex gap-1 justify-end items-center">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-7 w-7 rounded-md hover:bg-secondary text-muted-foreground hover:text-primary" 
+                            title="View Voucher" 
+                            onClick={() => handleViewVoucher(voucher.id || voucher._id)}
+                          >
+                            <Eye className="w-3.5 h-3.5" />
                           </Button>
-                          <Button variant="ghost" size="icon-sm" title="Download" onClick={() => handleDownloadVoucher(voucher)}>
-                            <Download className="w-4 h-4 text-indigo-500" />
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-7 w-7 rounded-md hover:bg-secondary text-muted-foreground hover:text-indigo-600" 
+                            title="Download Voucher" 
+                            onClick={() => handleDownloadVoucher(voucher)}
+                          >
+                            <Download className="w-3.5 h-3.5" />
                           </Button>
                           {voucher.status !== 'paid' && voucher.status !== 'cancelled' && (
                             <>
-                              <Button variant="ghost" size="icon-sm" title="Edit" onClick={() => handleEditVoucher(voucher)}>
-                                <Edit className="w-4 h-4 text-amber-500" />
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-7 w-7 rounded-md hover:bg-secondary text-muted-foreground hover:text-amber-600" 
+                                title="Edit Voucher" 
+                                onClick={() => handleEditVoucher(voucher)}
+                              >
+                                <Edit className="w-3.5 h-3.5" />
                               </Button>
-                              <Button variant="ghost" size="icon-sm" title="Payment" onClick={() => handleOpenManualPayment(voucher)}>
-                                <CreditCard className="w-4 h-4 text-emerald-500" />
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-7 w-7 rounded-md hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400" 
+                                title="Record Manual Payment" 
+                                onClick={() => handleOpenManualPayment(voucher)}
+                              >
+                                <CreditCard className="w-3.5 h-3.5" />
                               </Button>
-                              <Button variant="ghost" size="icon-sm" title="Cancel" onClick={() => handleCancelVoucher(voucher.id || voucher._id)}>
-                                <XCircle className="w-4 h-4 text-rose-500" />
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-7 w-7 rounded-md hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-500" 
+                                title="Cancel Voucher" 
+                                onClick={() => handleCancelVoucher(voucher.id || voucher._id)}
+                              >
+                                <XCircle className="w-3.5 h-3.5" />
                               </Button>
-                              <Button variant="ghost" size="icon-sm" title="Delete" onClick={() => handleDeleteVoucher(voucher.id || voucher._id)}>
-                                <Trash2 className="w-4 h-4 text-red-500" />
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-7 w-7 rounded-md hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400" 
+                                title="Delete Voucher" 
+                                onClick={() => handleDeleteVoucher(voucher.id || voucher._id)}
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
                               </Button>
                             </>
                           )}
@@ -856,18 +898,19 @@ export default function SuperAdminFeeVouchersPage() {
     if (total <= ITEMS_PER_PAGE) return null;
 
     return (
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t">
-        <div className="text-sm text-gray-600 dark:text-gray-400">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 sm:p-4 border-t border-border/50">
+        <div className="text-xs text-muted-foreground font-medium">
           Showing {startIndex} to {endIndex} of {total} vouchers
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <Button
             variant="outline"
             size="sm"
+            className="h-8 px-2.5 rounded-lg text-xs font-semibold border-border hover:bg-secondary"
             disabled={currentPage === 1}
             onClick={() => onPageChange(tabKey, currentPage - 1)}
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-3.5 h-3.5 mr-1" />
             Previous
           </Button>
           <div className="flex items-center gap-1">
@@ -888,7 +931,7 @@ export default function SuperAdminFeeVouchersPage() {
                   key={pageNum}
                   variant={currentPage === pageNum ? 'default' : 'outline'}
                   size="sm"
-                  className="w-8 h-8 p-0"
+                  className="w-8 h-8 p-0 text-xs font-semibold rounded-lg"
                   onClick={() => onPageChange(tabKey, pageNum)}
                 >
                   {pageNum}
@@ -899,11 +942,12 @@ export default function SuperAdminFeeVouchersPage() {
           <Button
             variant="outline"
             size="sm"
+            className="h-8 px-2.5 rounded-lg text-xs font-semibold border-border hover:bg-secondary"
             disabled={currentPage === totalPages}
             onClick={() => onPageChange(tabKey, currentPage + 1)}
           >
             Next
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-3.5 h-3.5 ml-1" />
           </Button>
         </div>
       </div>
@@ -915,124 +959,106 @@ export default function SuperAdminFeeVouchersPage() {
   }
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Fee Vouchers</h1>
-          <p className="text-gray-600 dark:text-gray-400">Manage fee Vouchers for All Branches</p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={fetchAllVouchers}>
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Refresh
-          </Button>
-          <Button onClick={() => { resetForm(); setIsGenerateModalOpen(true); }}>
-            <Plus className="w-4 h-4 mr-2" />
-            Generate Vouchers
-          </Button>
-        </div>
-      </div>
+      <DashboardHeader
+        title="Fee Vouchers"
+        subtitle="Manage, generate and track student fee vouchers across all branches"
+        onRefresh={fetchAllVouchers}
+      >
+        <Button 
+          onClick={() => { resetForm(); setIsGenerateModalOpen(true); }}
+          size="sm"
+          className="h-8 px-3 rounded-lg text-xs font-semibold gap-1.5 shadow-xs"
+        >
+          <Plus className="w-3.5 h-3.5" />
+          <span>Generate Vouchers</span>
+        </Button>
+      </DashboardHeader>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleTabChange('all')}>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-gray-600" />
-              <span className="text-sm text-gray-600">All</span>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
+        {[
+          { key: 'all', title: 'All Vouchers', count: statistics.all.count, amount: statistics.all.totalAmount, icon: FileText, iconBg: 'bg-primary/10 text-primary border-primary/20' },
+          { key: 'pending', title: 'Pending', count: statistics.pending.count, amount: statistics.pending.totalAmount, icon: Clock, iconBg: 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800/40' },
+          { key: 'partial', title: 'Partial', count: statistics.partial.count, amount: statistics.partial.totalAmount, icon: CreditCard, iconBg: 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800/40' },
+          { key: 'overdue', title: 'Overdue', count: statistics.overdue.count, amount: statistics.overdue.totalAmount, icon: AlertTriangle, iconBg: 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800/40' },
+          { key: 'paid', title: 'Paid', count: statistics.paid.count, amount: statistics.paid.totalAmount, icon: CheckCircle, iconBg: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/40' },
+          { key: 'cancelled', title: 'Cancelled', count: statistics.cancelled.count, amount: statistics.cancelled.totalAmount, icon: XCircle, iconBg: 'bg-secondary text-secondary-foreground border-border' },
+        ].map(stat => (
+          <Card 
+            key={stat.key}
+            className={cn(
+              "cursor-pointer transition-all duration-200 border bg-card hover:shadow-md rounded-xl p-3 sm:p-3.5 relative overflow-hidden",
+              activeTab === stat.key 
+                ? "border-primary ring-1 ring-primary/30 shadow-xs bg-primary/[0.02]" 
+                : "border-border hover:border-border/80"
+            )} 
+            onClick={() => handleTabChange(stat.key)}
+          >
+            <div className="flex items-center justify-between gap-2 mb-1.5">
+              <span className="text-[11px] font-semibold text-muted-foreground truncate uppercase tracking-wider">{stat.title}</span>
+              <div className={cn("w-6 h-6 rounded-md border flex items-center justify-center flex-shrink-0", stat.iconBg)}>
+                <stat.icon className="w-3.5 h-3.5" />
+              </div>
             </div>
-            <div className="text-2xl font-bold mt-2">{statistics.all.count}</div>
-            <div className="text-xs text-gray-500">PKR {statistics.all.totalAmount.toLocaleString()}</div>
-          </CardContent>
-        </Card>
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleTabChange('pending')}>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Clock className="w-5 h-5 text-yellow-600" />
-              <span className="text-sm text-gray-600">Pending</span>
+            <div className="text-lg sm:text-xl font-bold tracking-tight text-foreground">
+              {stat.count}
             </div>
-            <div className="text-2xl font-bold mt-2">{statistics.pending.count}</div>
-            <div className="text-xs text-gray-500">PKR {statistics.pending.totalAmount.toLocaleString()}</div>
-          </CardContent>
-        </Card>
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleTabChange('partial')}>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-blue-600" />
-              <span className="text-sm text-gray-600">Partial</span>
+            <div className="text-[11px] font-medium text-muted-foreground truncate mt-0.5">
+              PKR {Number(stat.amount || 0).toLocaleString()}
             </div>
-            <div className="text-2xl font-bold mt-2">{statistics.partial.count}</div>
-            <div className="text-xs text-gray-500">PKR {statistics.partial.totalAmount.toLocaleString()}</div>
-          </CardContent>
-        </Card>
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleTabChange('overdue')}>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-600" />
-              <span className="text-sm text-gray-600">Overdue</span>
-            </div>
-            <div className="text-2xl font-bold mt-2">{statistics.overdue.count}</div>
-            <div className="text-xs text-gray-500">PKR {statistics.overdue.totalAmount.toLocaleString()}</div>
-          </CardContent>
-        </Card>
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleTabChange('paid')}>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-600" />
-              <span className="text-sm text-gray-600">Paid</span>
-            </div>
-            <div className="text-2xl font-bold mt-2">{statistics.paid.count}</div>
-            <div className="text-xs text-gray-500">PKR {statistics.paid.totalAmount.toLocaleString()}</div>
-          </CardContent>
-        </Card>
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleTabChange('cancelled')}>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <XCircle className="w-5 h-5 text-gray-600" />
-              <span className="text-sm text-gray-600">Cancelled</span>
-            </div>
-            <div className="text-2xl font-bold mt-2">{statistics.cancelled.count}</div>
-            <div className="text-xs text-gray-500">PKR {statistics.cancelled.totalAmount.toLocaleString()}</div>
-          </CardContent>
-        </Card>
+          </Card>
+        ))}
       </div>
 
-      {/* Tabs */}
-      <div className="space-y-6">
-        <div className="flex flex-wrap gap-2 mb-4">
-          <button onClick={() => handleTabChange('all')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'all' ? 'bg-primary text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
-            All Vouchers
-          </button>
-          <button onClick={() => handleTabChange('pending')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'pending' ? 'bg-yellow-500 text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
-            Pending
-          </button>
-          <button onClick={() => handleTabChange('partial')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'partial' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
-            Partial
-          </button>
-          <button onClick={() => handleTabChange('overdue')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'overdue' ? 'bg-red-500 text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
-            Overdue
-          </button>
-          <button onClick={() => handleTabChange('paid')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'paid' ? 'bg-green-500 text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
-            Paid
-          </button>
-          <button onClick={() => handleTabChange('cancelled')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'cancelled' ? 'bg-gray-500 text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
-            Cancelled
-          </button>
+      {/* Tabs & Filters */}
+      <div className="space-y-3.5">
+        <div className="bg-card rounded-xl p-1 border border-border shadow-xs flex flex-wrap items-center gap-1">
+          {[
+            { key: 'all', label: 'All Vouchers', count: statistics.all.count },
+            { key: 'pending', label: 'Pending', count: statistics.pending.count },
+            { key: 'partial', label: 'Partial', count: statistics.partial.count },
+            { key: 'overdue', label: 'Overdue', count: statistics.overdue.count },
+            { key: 'paid', label: 'Paid', count: statistics.paid.count },
+            { key: 'cancelled', label: 'Cancelled', count: statistics.cancelled.count },
+          ].map(tab => (
+            <button 
+              key={tab.key}
+              onClick={() => handleTabChange(tab.key)} 
+              className={cn(
+                "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5",
+                activeTab === tab.key 
+                  ? "bg-primary text-primary-foreground shadow-xs" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+              )}
+            >
+              <span>{tab.label}</span>
+              <span className={cn(
+                "px-1.5 py-0.2 rounded-full text-[10px] font-bold",
+                activeTab === tab.key 
+                  ? "bg-primary-foreground/20 text-primary-foreground" 
+                  : "bg-muted text-muted-foreground"
+              )}>
+                {tab.count}
+              </span>
+            </button>
+          ))}
         </div>
 
         {/* Common Filters */}
-        <Card className="mb-6">
-          <CardContent className="p-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <Card className="border border-border bg-card shadow-xs">
+          <CardContent className="p-3 sm:p-3.5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-2.5">
               <Input 
-                placeholder="Search by name, voucher #..." 
+                placeholder="Search name, voucher #..." 
                 value={search} 
                 onChange={(e) => {
                   setSearch(e.target.value);
                   if (e.target.value) setGrSearch('');
                 }} 
                 icon={Search} 
+                className="w-full text-xs"
               />
               <Input 
                 placeholder="Search by GR Number..." 
@@ -1042,23 +1068,27 @@ export default function SuperAdminFeeVouchersPage() {
                   if (e.target.value) setSearch('');
                 }} 
                 icon={Search} 
+                className="w-full text-xs"
               />
               <BranchSelect 
                 value={branchFilter} 
                 onChange={(e) => setBranchFilter(e.target.value)} 
                 includeAll={true}
+                className="w-full text-xs"
               />
               <Dropdown 
                 placeholder="All Months" 
                 value={monthFilter} 
                 onChange={(e) => setMonthFilter(e.target.value)} 
                 options={[{ value: '', label: 'All Months' }, ...MONTHS]} 
+                className="w-full text-xs"
               />
               <Input 
                 type="number" 
                 placeholder="Year" 
                 value={yearFilter} 
                 onChange={(e) => setYearFilter(e.target.value)} 
+                className="w-full text-xs"
               />
             </div>
           </CardContent>
@@ -1066,11 +1096,19 @@ export default function SuperAdminFeeVouchersPage() {
 
         {/* Tab Panels */}
         <TabPanel value="all" activeTab={activeTab}>
-          <Card>
-            <CardHeader>
-              <CardTitle>All Fee Vouchers ({statistics.all.count})</CardTitle>
+          <Card className="border border-border bg-card shadow-xs overflow-hidden">
+            <CardHeader className="p-3.5 sm:p-4 pb-2 border-b border-border/50 flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-foreground">
+                <div className="w-6 h-6 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                  <FileText className="w-3.5 h-3.5" />
+                </div>
+                All Fee Vouchers
+              </CardTitle>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-secondary text-secondary-foreground border border-border">
+                {statistics.all.count} total
+              </span>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               <VoucherTable 
                 vouchers={filteredAndCategorizedVouchers.all} 
                 tabKey="all" 
@@ -1080,14 +1118,19 @@ export default function SuperAdminFeeVouchersPage() {
         </TabPanel>
 
         <TabPanel value="pending" activeTab={activeTab}>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-yellow-600" />
-                Pending Fee Vouchers ({statistics.pending.count})
+          <Card className="border border-border bg-card shadow-xs overflow-hidden">
+            <CardHeader className="p-3.5 sm:p-4 pb-2 border-b border-border/50 flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-foreground">
+                <div className="w-6 h-6 rounded-md bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/40 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                  <Clock className="w-3.5 h-3.5" />
+                </div>
+                Pending Fee Vouchers
               </CardTitle>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/40">
+                {statistics.pending.count} pending
+              </span>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               <VoucherTable 
                 vouchers={filteredAndCategorizedVouchers.pending} 
                 tabKey="pending" 
@@ -1097,14 +1140,19 @@ export default function SuperAdminFeeVouchersPage() {
         </TabPanel>
 
         <TabPanel value="partial" activeTab={activeTab}>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="w-5 h-5 text-blue-600" />
-                Partially Paid Fee Vouchers ({statistics.partial.count})
+          <Card className="border border-border bg-card shadow-xs overflow-hidden">
+            <CardHeader className="p-3.5 sm:p-4 pb-2 border-b border-border/50 flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-foreground">
+                <div className="w-6 h-6 rounded-md bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/40 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                  <CreditCard className="w-3.5 h-3.5" />
+                </div>
+                Partially Paid Fee Vouchers
               </CardTitle>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800/40">
+                {statistics.partial.count} partial
+              </span>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               <VoucherTable 
                 vouchers={filteredAndCategorizedVouchers.partial} 
                 tabKey="partial" 
@@ -1114,14 +1162,19 @@ export default function SuperAdminFeeVouchersPage() {
         </TabPanel>
 
         <TabPanel value="overdue" activeTab={activeTab}>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
-                Overdue Fee Vouchers ({statistics.overdue.count})
+          <Card className="border border-border bg-card shadow-xs overflow-hidden">
+            <CardHeader className="p-3.5 sm:p-4 pb-2 border-b border-border/50 flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-foreground">
+                <div className="w-6 h-6 rounded-md bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/40 flex items-center justify-center text-rose-600 dark:text-rose-400">
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                </div>
+                Overdue Fee Vouchers
               </CardTitle>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800/40">
+                {statistics.overdue.count} overdue
+              </span>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               <VoucherTable 
                 vouchers={filteredAndCategorizedVouchers.overdue} 
                 tabKey="overdue" 
@@ -1131,14 +1184,19 @@ export default function SuperAdminFeeVouchersPage() {
         </TabPanel>
 
         <TabPanel value="paid" activeTab={activeTab}>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                Paid Fee Vouchers ({statistics.paid.count})
+          <Card className="border border-border bg-card shadow-xs overflow-hidden">
+            <CardHeader className="p-3.5 sm:p-4 pb-2 border-b border-border/50 flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-foreground">
+                <div className="w-6 h-6 rounded-md bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                  <CheckCircle className="w-3.5 h-3.5" />
+                </div>
+                Paid Fee Vouchers
               </CardTitle>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/40">
+                {statistics.paid.count} paid
+              </span>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               <VoucherTable 
                 vouchers={filteredAndCategorizedVouchers.paid} 
                 tabKey="paid" 
@@ -1148,14 +1206,19 @@ export default function SuperAdminFeeVouchersPage() {
         </TabPanel>
 
         <TabPanel value="cancelled" activeTab={activeTab}>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <XCircle className="w-5 h-5 text-gray-600" />
-                Cancelled Fee Vouchers ({statistics.cancelled.count})
+          <Card className="border border-border bg-card shadow-xs overflow-hidden">
+            <CardHeader className="p-3.5 sm:p-4 pb-2 border-b border-border/50 flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-foreground">
+                <div className="w-6 h-6 rounded-md bg-secondary border border-border flex items-center justify-center text-muted-foreground">
+                  <XCircle className="w-3.5 h-3.5" />
+                </div>
+                Cancelled Fee Vouchers
               </CardTitle>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-secondary text-secondary-foreground border border-border">
+                {statistics.cancelled.count} cancelled
+              </span>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               <VoucherTable 
                 vouchers={filteredAndCategorizedVouchers.cancelled} 
                 tabKey="cancelled" 

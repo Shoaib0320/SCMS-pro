@@ -8,11 +8,15 @@ import { API_ENDPOINTS } from '@/constants/api-endpoints';
 import { toast } from 'sonner';
 import {
   Users, Plus, Search, Edit, Trash2, Phone, Mail,
-  Calendar, GraduationCap, Award, FileText, Eye
+  Calendar, GraduationCap, Award, FileText, Eye,
+  UserCheck, UserX, Clock, Building2, X, RotateCcw
 } from 'lucide-react';
 import Modal from '@/components/ui/modal';
 import Table, { TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
+import StatsCard from '@/components/dashboard/StatsCard';
 import Input from '@/components/ui/input';
 import Dropdown from '@/components/ui/dropdown';
 import BranchSelect from '@/components/ui/branch-select';
@@ -225,179 +229,177 @@ export default function TeachersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="space-y-4">
       {fullPageLoading && <FullPageLoader message="Processing..." />}
       
       {/* Header */}
-      <div className="mb-6 pt-8">
-        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-          <Users className="h-8 w-8 text-blue-600" />
-          Teacher Management
-        </h1>
-        <p className="text-gray-600 mt-1">Manage teachers, assignments, and QR codes</p>
+      <DashboardHeader
+        title="Teacher Management"
+        subtitle="Manage academic faculty, assignments, and campus allocations"
+        onRefresh={() => {
+          fetchTeachers();
+          fetchTeacherStats();
+        }}
+      >
+        <Button
+          onClick={handleAddNew}
+          size="sm"
+          className="h-8 px-3 text-xs font-semibold rounded-lg bg-primary hover:bg-primary-hover text-primary-foreground transition-colors cursor-pointer"
+        >
+          <Plus className="w-3.5 h-3.5 mr-1" />
+          Add Teacher
+        </Button>
+      </DashboardHeader>
+
+      {/* Stats Cards (Compact 4-column Grid) */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5">
+        <StatsCard 
+          title="Total Teachers"
+          value={stats.total || teachers.length}
+          icon={Users}
+          description="Academic faculty"
+          color="blue"
+        />
+        <StatsCard 
+          title="Active Faculty"
+          value={stats.active}
+          icon={UserCheck}
+          description="Actively teaching"
+          color="green"
+        />
+        <StatsCard 
+          title="On Leave"
+          value={stats.onLeave}
+          icon={Clock}
+          description="Approved leaves"
+          color="orange"
+        />
+        <StatsCard 
+          title="Terminated / Inactive"
+          value={stats.terminated}
+          icon={UserX}
+          description="Deactivated records"
+          color="red"
+        />
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {loading ? (
-          <>
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <Skeleton className="h-4 w-24 mb-2" />
-                <Skeleton className="h-8 w-16" />
-              </div>
-            ))}
-          </>
-        ) : (
-          <>
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Total Teachers</p>
-                  <h3 className="text-2xl font-bold text-gray-900 mt-1">{stats.total}</h3>
-                </div>
-                <div className="h-12 w-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                  <Users className="h-6 w-6 text-blue-600" />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Active</p>
-                  <h3 className="text-2xl font-bold text-green-600 mt-1">{stats.active}</h3>
-                </div>
-                <div className="h-12 w-12 bg-green-50 rounded-xl flex items-center justify-center">
-                  <Users className="h-6 w-6 text-green-600" />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">On Leave</p>
-                  <h3 className="text-2xl font-bold text-orange-600 mt-1">{stats.onLeave}</h3>
-                </div>
-                <div className="h-12 w-12 bg-orange-50 rounded-xl flex items-center justify-center">
-                  <Users className="h-6 w-6 text-orange-600" />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Terminated</p>
-                  <h3 className="text-2xl font-bold text-red-600 mt-1">{stats.terminated}</h3>
-                </div>
-                <div className="h-12 w-12 bg-red-50 rounded-xl flex items-center justify-center">
-                  <Users className="h-6 w-6 text-red-600" />
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* Filters and Actions */}
-      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
-        <div className="flex flex-col lg:flex-row gap-4">
-          <div className="flex-1">
-            <Input
+      {/* Compact Search & Filter Toolbar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 p-2.5 rounded-xl border border-border bg-card shadow-xs">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-1">
+          {/* Search Input */}
+          <div className="relative flex-1 max-w-sm">
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="text"
               placeholder="Search by name, email, phone, employee ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              icon={Search}
+              className="w-full h-8 pl-8 pr-8 text-xs rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors"
             />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
           </div>
 
-          <div className="w-full lg:w-48">
-            <BranchSelect
+          {/* Branch Filter */}
+          <div className="w-full sm:w-44">
+            <select
               value={selectedBranch}
               onChange={(e) => setSelectedBranch(e.target.value)}
-              branches={branches}
-              placeholder="All Branches"
-            />
+              className="w-full h-8 px-2 text-xs rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors cursor-pointer"
+            >
+              <option value="">All Branches</option>
+              {branches.map(branch => (
+                <option key={branch.id} value={branch.id}>{branch.name}</option>
+              ))}
+            </select>
           </div>
 
-          {/* 
-          <div className="w-full lg:w-48">
-            <Dropdown
-              value={selectedDesignation}
-              onChange={(e) => setSelectedDesignation(e.target.value)}
-              options={[
-                { label: 'All Designations', value: '' },
-                { label: 'Principal', value: 'Principal' },
-                { label: 'Vice Principal', value: 'Vice Principal' },
-                { label: 'Head Teacher', value: 'Head Teacher' },
-                { label: 'Senior Teacher', value: 'Senior Teacher' },
-                { label: 'Teacher', value: 'Teacher' },
-              ]}
-              placeholder="All Designations"
-            />
-          </div>
-          */}
-
-          <div className="w-full lg:w-48">
-            <Dropdown
+          {/* Status Filter */}
+          <div className="w-full sm:w-36">
+            <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              options={[
-                { label: 'Active', value: 'active' },
-                { label: 'Inactive', value: 'inactive' },
-                { label: 'All Status', value: 'all' },
-                { label: 'On Leave', value: 'on_leave' },
-                { label: 'Terminated', value: 'terminated' },
-              ]}
-              placeholder="All Status"
-            />
+              className="w-full h-8 px-2 text-xs rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors cursor-pointer"
+            >
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="on_leave">On Leave</option>
+              <option value="terminated">Terminated</option>
+            </select>
           </div>
 
-          <Button onClick={handleAddNew} variant="default" className="whitespace-nowrap">
-            <Plus className="h-5 w-5" />
-            Add Teacher
-          </Button>
+          {/* Reset Filters Button */}
+          {(searchTerm || selectedBranch || (selectedStatus && selectedStatus !== 'active')) && (
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedBranch('');
+                setSelectedStatus('active');
+              }}
+              className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 cursor-pointer transition-colors"
+              title="Reset filters"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Reset</span>
+            </button>
+          )}
+        </div>
+
+        {/* Counter Badge */}
+        <div className="text-right flex items-center justify-between sm:justify-end gap-2">
+          <span className="text-[11px] font-medium text-muted-foreground">
+            {teachers.length} {teachers.length === 1 ? 'teacher' : 'teachers'} listed
+          </span>
         </div>
       </div>
 
-      {/* Teachers Table */}
-      <UserManagementTable
-        data={teachers.slice((pagination.page - 1) * pagination.limit, pagination.page * pagination.limit)}
-        loading={loading}
-        onView={handleView}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onToggleStatus={async (teacher) => {
-          try {
-            const formData = new FormData();
-            formData.append('data', JSON.stringify({
-              is_active: !teacher.is_active,
-              status: !teacher.is_active ? 'active' : 'inactive'
-            }));
+      {/* Teachers Table Card */}
+      <Card className="border border-border bg-card shadow-xs overflow-hidden">
+        <CardContent className="p-0">
+          <UserManagementTable
+            data={teachers.slice((pagination.page - 1) * pagination.limit, pagination.page * pagination.limit)}
+            loading={loading}
+            onView={handleView}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onToggleStatus={async (teacher) => {
+              try {
+                const formData = new FormData();
+                formData.append('data', JSON.stringify({
+                  is_active: !teacher.is_active,
+                  status: !teacher.is_active ? 'active' : 'inactive'
+                }));
 
-            const response = await apiClient.put(
-              API_ENDPOINTS.SUPER_ADMIN.TEACHERS.UPDATE.replace(':id', teacher.id), 
-              formData
-            );
-            
-            if (response.success) {
-              toast.success(`Teacher ${!teacher.is_active ? 'activated' : 'deactivated'} successfully`);
-              fetchTeachers();
-              fetchTeacherStats();
-            }
-          } catch (error) {
-            toast.error('Failed to update status');
-          }
-        }}
-      />
+                const response = await apiClient.put(
+                  API_ENDPOINTS.SUPER_ADMIN.TEACHERS.UPDATE.replace(':id', teacher.id), 
+                  formData
+                );
+                
+                if (response.success) {
+                  toast.success(`Teacher ${!teacher.is_active ? 'activated' : 'deactivated'} successfully`);
+                  fetchTeachers();
+                  fetchTeacherStats();
+                }
+              } catch (error) {
+                toast.error('Failed to update status');
+              }
+            }}
+          />
+        </CardContent>
+      </Card>
 
       {/* Pagination Controls */}
       {Math.ceil(teachers.length / pagination.limit) > 1 && (
-        <div className="flex items-center justify-between mt-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-          <div className="text-sm text-gray-600 font-medium">
-            Showing <span className="font-bold text-blue-600">{((pagination.page - 1) * pagination.limit) + 1}</span> to <span className="font-bold text-blue-600">{Math.min(pagination.page * pagination.limit, teachers.length)}</span> of {teachers.length} teachers
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-2.5 sm:p-3 rounded-xl border border-border bg-card shadow-xs">
+          <div className="text-xs text-muted-foreground font-medium">
+            Showing <span className="font-bold text-primary">{((pagination.page - 1) * pagination.limit) + 1}</span> to <span className="font-bold text-primary">{Math.min(pagination.page * pagination.limit, teachers.length)}</span> of {teachers.length} teachers
           </div>
           <div className="flex gap-2">
             <Button
@@ -405,6 +407,7 @@ export default function TeachersPage() {
               size="sm"
               onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
               disabled={pagination.page === 1}
+              className="h-7 px-3 text-xs"
             >
               Previous
             </Button>
@@ -414,7 +417,7 @@ export default function TeachersPage() {
                   key={i + 1}
                   variant={pagination.page === i + 1 ? "default" : "outline"}
                   size="sm"
-                  className="w-8 h-8 p-0"
+                  className={`w-7 h-7 p-0 text-xs ${pagination.page === i + 1 ? 'font-semibold' : ''}`}
                   onClick={() => setPagination(prev => ({ ...prev, page: i + 1 }))}
                 >
                   {i + 1}
@@ -426,6 +429,7 @@ export default function TeachersPage() {
               size="sm"
               onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
               disabled={pagination.page >= Math.ceil(teachers.length / pagination.limit)}
+              className="h-7 px-3 text-xs"
             >
               Next
             </Button>

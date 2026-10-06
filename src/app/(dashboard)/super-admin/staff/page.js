@@ -14,9 +14,17 @@ import {
   Trash2, 
   Eye, 
   Download,
-  Filter
+  Filter,
+  UserCheck,
+  UserX,
+  Building2,
+  X,
+  RotateCcw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
+import StatsCard from '@/components/dashboard/StatsCard';
 import Modal from '@/components/ui/modal';
 import AddStaffModal from '@/components/modals/AddStaffModal';
 import FullPageLoader from '@/components/ui/full-page-loader';
@@ -210,87 +218,155 @@ export default function SuperAdminStaffPage() {
   };
 
 
+  const activeCount = staff.filter((s) => s.is_active === true).length;
+  const inactiveCount = staff.filter((s) => s.is_active === false).length;
+  const branchesCount = new Set(staff.map((s) => s.branch_id).filter(Boolean)).size;
+
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Staff Management</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Manage all staff members</p>
-        </div>
-        <Button onClick={handleAddStaff} className="flex items-center gap-2">
-          <Plus className="w-4 h-4" />
+      <DashboardHeader
+        title="Staff Management"
+        subtitle="Manage all institutional staff members across branches"
+        onRefresh={loadStaff}
+      >
+        <Button
+          onClick={handleAddStaff}
+          size="sm"
+          className="h-8 px-3 text-xs font-semibold rounded-lg bg-primary hover:bg-primary-hover text-primary-foreground transition-colors cursor-pointer"
+        >
+          <Plus className="w-3.5 h-3.5 mr-1" />
           Add Staff
         </Button>
+      </DashboardHeader>
+
+      {/* Stats Cards (Compact 4-column Grid) */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5">
+        <StatsCard 
+          title="Total Staff"
+          value={staff.length}
+          icon={Users}
+          description="Institutional workforce"
+          color="blue"
+        />
+        <StatsCard 
+          title="Active Staff"
+          value={activeCount}
+          icon={UserCheck}
+          description="Operational accounts"
+          color="green"
+        />
+        <StatsCard 
+          title="Inactive Staff"
+          value={inactiveCount}
+          icon={UserX}
+          description="Suspended / disabled"
+          color="red"
+        />
+        <StatsCard 
+          title="Assigned Branches"
+          value={branchesCount || branches.length}
+          icon={Building2}
+          description="Branch deployments"
+          color="purple"
+        />
       </div>
 
-      {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Search */}
-          <div className="md:col-span-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search by name, email, or employee ID..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
-              />
-            </div>
+      {/* Compact Search & Filter Toolbar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 p-2.5 rounded-xl border border-border bg-card shadow-xs">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-1">
+          {/* Search Input */}
+          <div className="relative flex-1 max-w-sm">
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search by name, email, registration..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full h-8 pl-8 pr-8 text-xs rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
           </div>
 
           {/* Branch Filter */}
-          <div className="w-full">
-            <Dropdown
-              id="branchFilter"
-              name="branchFilter"
+          <div className="w-full sm:w-44">
+            <select
               value={branchFilter}
               onChange={(e) => setBranchFilter(e.target.value)}
-              options={[
-                { label: 'All Branches', value: 'all' },
-                ...branches.map(branch => ({ label: branch.name, value: branch.id }))
-              ]}
-              placeholder="Filter by Branch"
-            />
+              className="w-full h-8 px-2 text-xs rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors cursor-pointer"
+            >
+              <option value="all">All Branches</option>
+              {branches.map(branch => (
+                <option key={branch.id} value={branch.id}>{branch.name}</option>
+              ))}
+            </select>
           </div>
 
           {/* Status Filter */}
-          <div className="w-full">
-            <Dropdown
-              id="statusFilter"
-              name="statusFilter"
+          <div className="w-full sm:w-36">
+            <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              options={STATUS_OPTIONS}
-              placeholder="Filter by Status"
-            />
+              className="w-full h-8 px-2 text-xs rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors cursor-pointer"
+            >
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
           </div>
+
+          {/* Clear filters button if active */}
+          {(searchQuery || branchFilter !== 'all' || statusFilter !== 'active') && (
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setBranchFilter('all');
+                setStatusFilter('active');
+              }}
+              className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 cursor-pointer transition-colors"
+              title="Reset filters"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Reset</span>
+            </button>
+          )}
         </div>
 
-        {/* Results count */}
-        <div className="text-sm text-gray-600 dark:text-gray-400">
-          Showing {filteredStaff.length} of {staff.length} staff members
+        {/* Counter Badge */}
+        <div className="text-right flex items-center justify-between sm:justify-end gap-2">
+          <span className="text-[11px] font-medium text-muted-foreground">
+            {filteredStaff.length} of {staff.length} {filteredStaff.length === 1 ? 'member' : 'members'}
+          </span>
         </div>
       </div>
 
-      {/* Staff Table */}
-      <UserManagementTable
-        data={paginatedStaff}
-        loading={loading}
-        onView={handleViewStaff}
-        onEdit={handleEditStaff}
-        onDelete={handleDeleteStaff}
-        onToggleStatus={handleToggleStatus}
-        onChangePassword={handleChangePassword}
-      />
+      {/* Staff Table Card */}
+      <Card className="border border-border bg-card shadow-xs overflow-hidden">
+        <CardContent className="p-0">
+          <UserManagementTable
+            data={paginatedStaff}
+            loading={loading}
+            onView={handleViewStaff}
+            onEdit={handleEditStaff}
+            onDelete={handleDeleteStaff}
+            onToggleStatus={handleToggleStatus}
+            onChangePassword={handleChangePassword}
+          />
+        </CardContent>
+      </Card>
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-6 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-          <div className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-            Showing <span className="font-bold text-blue-600">{((pagination.page - 1) * pagination.limit) + 1}</span> to <span className="font-bold text-blue-600">{Math.min(pagination.page * pagination.limit, filteredStaff.length)}</span> of {filteredStaff.length} members
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-2.5 sm:p-3 rounded-xl border border-border bg-card shadow-xs">
+          <div className="text-xs text-muted-foreground font-medium">
+            Showing <span className="font-bold text-primary">{((pagination.page - 1) * pagination.limit) + 1}</span> to <span className="font-bold text-primary">{Math.min(pagination.page * pagination.limit, filteredStaff.length)}</span> of {filteredStaff.length} members
           </div>
           <div className="flex gap-2">
             <Button
@@ -298,7 +374,7 @@ export default function SuperAdminStaffPage() {
               size="sm"
               onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
               disabled={pagination.page === 1}
-              className="px-4"
+              className="h-7 px-3 text-xs"
             >
               Previous
             </Button>
@@ -308,7 +384,7 @@ export default function SuperAdminStaffPage() {
                   key={i + 1}
                   variant={pagination.page === i + 1 ? "default" : "outline"}
                   size="sm"
-                  className={`w-8 h-8 p-0 ${pagination.page === i + 1 ? 'shadow-md shadow-blue-500/20' : ''}`}
+                  className={`w-7 h-7 p-0 text-xs ${pagination.page === i + 1 ? 'font-semibold' : ''}`}
                   onClick={() => setPagination(prev => ({ ...prev, page: i + 1 }))}
                 >
                   {i + 1}
@@ -320,7 +396,7 @@ export default function SuperAdminStaffPage() {
               size="sm"
               onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
               disabled={pagination.page >= totalPages}
-              className="px-4"
+              className="h-7 px-3 text-xs"
             >
               Next
             </Button>

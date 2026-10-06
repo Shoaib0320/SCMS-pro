@@ -17,10 +17,12 @@ import apiClient from '@/lib/api-client';
 import API_ENDPOINTS from '@/constants/api-endpoints';
 import DatePicker from '@/components/ui/date-picker';
 import { toast } from 'sonner';
-import { Camera, Search, Save, CheckCircle, XCircle, Clock, UserSearch, Eye, DollarSign, Calendar, X, QrCode, Scan, Upload, FileText } from 'lucide-react';
+import { Camera, Search, Save, CheckCircle, XCircle, Clock, UserSearch, Eye, DollarSign, Calendar, X, QrCode, Scan, Upload, FileText, Building2, GraduationCap, Users, Filter, RotateCcw, Sparkles, Check } from 'lucide-react';
 import FullPageLoader from '@/components/ui/full-page-loader';
 import ButtonLoader from '@/components/ui/button-loader';
 import { Checkbox } from '@/components/ui/checkbox';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
+import { cn } from '@/lib/utils';
 
 const STATUS_OPTIONS = [
   { value: 'present', label: 'Present' },
@@ -973,6 +975,20 @@ export default function SuperAdminAttendancePage() {
 
 
   const sections = getSelectedClass()?.sections || [];
+  const selectedBranchObj = branches.find(b => (b.id || b._id) === selectedBranch);
+  const selectedClassObj = classes.find(c => (c.id || c._id) === selectedClass);
+  const selectedSectionObj = sections.find(s => (s.id || s._id || s.name) === selectedSection);
+  const filterStepCount = (selectedBranch ? 1 : 0) + (selectedClass ? 1 : 0) + (selectedSection ? 1 : 0);
+
+  const handleResetFilters = () => {
+    setSelectedBranch('');
+    setSelectedClass('');
+    setSelectedSection('');
+    setAttendanceType('daily');
+    setAttendanceDate(new Date().toISOString().split('T')[0]);
+    setStudents([]);
+    setFilteredStudents([]);
+  };
 
   const getSectionName = (sectionId) => {
     if (!sectionId) return '—';
@@ -1078,7 +1094,7 @@ export default function SuperAdminAttendancePage() {
   if (loading && !branches.length) return <FullPageLoader />;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-4">
       {/* Bulk Upload Modal */}
       <Modal
         open={isBulkUploadModalOpen}
@@ -1511,64 +1527,116 @@ export default function SuperAdminAttendancePage() {
         </div>
       </Modal>
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-800 dark:text-white tracking-tight">Attendance Management</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">Track and manage student presence across all branches</p>
-        </div>
-        
-        <div className="flex flex-wrap items-center gap-3">
+      <DashboardHeader
+        title="Attendance Management"
+        subtitle="Track and manage student presence, biometric/QR scans, and leaves across all branches"
+      >
+        <div className="flex flex-wrap items-center gap-2">
           <Button 
             onClick={handleOpenScanner} 
-            className="flex-1 md:flex-none bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 dark:shadow-none transition-all active:scale-95 py-6 px-6 rounded-2xl gap-2 font-bold"
+            size="sm"
+            className="h-8 px-3 rounded-lg text-xs font-semibold gap-1.5 shadow-xs bg-indigo-600 hover:bg-indigo-700 text-white"
           >
-            <Scan className="h-5 w-5" />
-            <span className="text-sm">Scan QR</span>
+            <Scan className="h-3.5 w-3.5" />
+            Scan QR
           </Button>
 
           <Button 
             onClick={() => setIsManualModalOpen(true)} 
             variant="outline"
-            className="flex-1 md:flex-none border-2 border-slate-200 hover:border-slate-300 dark:border-slate-700 dark:hover:border-slate-600 transition-all active:scale-95 py-6 px-6 rounded-2xl gap-2 font-bold text-slate-700 dark:text-slate-200"
+            size="sm"
+            className="h-8 px-3 rounded-lg text-xs font-semibold gap-1.5 border-border hover:bg-secondary text-foreground"
           >
-            <UserSearch className="h-5 w-5" />
-            <span className="text-sm">Manual</span>
+            <UserSearch className="h-3.5 w-3.5" />
+            Manual
           </Button>
 
           <Button
             onClick={() => handleAutoMarkAbsent(selectedBranch)}
             disabled={isProcessingAutoAbsent}
-            className="flex-1 md:flex-none bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-200 dark:shadow-none transition-all active:scale-95 py-6 px-6 rounded-2xl gap-2 font-bold"
+            variant="outline"
+            size="sm"
+            className="h-8 px-3 rounded-lg text-xs font-semibold gap-1.5 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 border-rose-200 dark:border-rose-800/40"
           >
             {isProcessingAutoAbsent ? (
-              <ButtonLoader color="white" />
+              <ButtonLoader color="currentColor" />
             ) : (
-              <XCircle className="h-5 w-5" />
+              <XCircle className="h-3.5 w-3.5" />
             )}
-            <span className="text-sm">Auto-Absent</span>
+            Auto-Absent
           </Button>
 
           <Button 
             onClick={() => setIsHolidayModalOpen(true)} 
-            className="flex-1 md:flex-none bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-100 dark:shadow-none transition-all active:scale-95 py-6 px-5 rounded-2xl"
+            variant="outline"
+            size="sm"
+            className="h-8 px-2.5 rounded-lg text-xs font-semibold border-border hover:bg-secondary text-amber-600 dark:text-amber-400"
             title="Mark Holiday"
           >
-            <Calendar className="h-5 w-5" />
+            <Calendar className="h-3.5 w-3.5 mr-1" />
+            Holiday
           </Button>
         </div>
-      </div>
+      </DashboardHeader>
 
-      <Card className="border-none shadow-sm rounded-3xl mb-8 relative z-20">
-        <CardHeader className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
-          <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            <Search className="h-5 w-5 text-indigo-500" />
-            Attendance Filters
-          </CardTitle>
+      <Card className="border border-border bg-card shadow-xs rounded-xl relative z-20 overflow-visible transition-all mb-3.5">
+        <CardHeader className="px-3.5 py-2 border-b border-border/50">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="h-6 w-6 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                <Filter className="h-3.5 w-3.5" />
+              </div>
+              <CardTitle className="text-xs sm:text-sm font-semibold text-foreground tracking-tight whitespace-nowrap">
+                Attendance Filters
+              </CardTitle>
+              <Badge variant="outline" className={cn(
+                "text-[10px] h-4.5 font-medium px-1.5 rounded-md",
+                filterStepCount === 3
+                  ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                  : "bg-indigo-500/10 text-indigo-600 border-indigo-500/20"
+              )}>
+                {filterStepCount === 3 ? "Ready" : `${filterStepCount}/3`}
+              </Badge>
+              {selectedBranchObj && selectedClassObj && selectedSectionObj && (
+                <span className="hidden md:inline-flex items-center gap-1 text-[11px] text-muted-foreground truncate ml-1">
+                  • <span className="text-foreground font-medium">{selectedBranchObj.name}</span>
+                  › <span>{selectedClassObj.name}</span>
+                  › <span>{selectedSectionObj.name}</span>
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1.5 shrink-0">
+              {(selectedBranch || selectedClass || selectedSection) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleResetFilters}
+                  className="h-6 px-2 text-[11px] text-muted-foreground hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-md gap-1"
+                >
+                  <RotateCcw className="w-2.5 h-2.5" />
+                  Reset
+                </Button>
+              )}
+            </div>
+          </div>
         </CardHeader>
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-            <div className="space-y-2">
-              <Label>Branch *</Label>
+
+        <CardContent className="p-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
+            {/* 1. Branch */}
+            <div className="space-y-1">
+              <div className="flex items-center justify-between text-[11px]">
+                <Label className="text-[11px] font-medium text-foreground flex items-center gap-1">
+                  <Building2 className="w-3 h-3 text-indigo-500" />
+                  Branch <span className="text-rose-500">*</span>
+                </Label>
+                {selectedBranch ? (
+                  <span className="text-[10px] text-emerald-600 font-medium">Set</span>
+                ) : (
+                  <span className="text-[10px] text-muted-foreground">Req</span>
+                )}
+              </div>
               <Dropdown
                 name="branch"
                 value={selectedBranch}
@@ -1578,9 +1646,17 @@ export default function SuperAdminAttendancePage() {
               />
             </div>
 
-
-            <div className="space-y-2 relative z-30">
-              <Label>Date</Label>
+            {/* 2. Date */}
+            <div className="space-y-1 relative z-30">
+              <div className="flex items-center justify-between text-[11px]">
+                <Label className="text-[11px] font-medium text-foreground flex items-center gap-1">
+                  <Calendar className="w-3 h-3 text-blue-500" />
+                  Date
+                </Label>
+                {attendanceDate === new Date().toISOString().split('T')[0] && (
+                  <span className="text-[10px] text-blue-600 font-medium">Today</span>
+                )}
+              </div>
               <DatePicker
                 name="date"
                 value={attendanceDate}
@@ -1588,131 +1664,167 @@ export default function SuperAdminAttendancePage() {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label>Class *</Label>
+            {/* 3. Class */}
+            <div className={cn("space-y-1", !selectedBranch && "opacity-60")}>
+              <div className="flex items-center justify-between text-[11px]">
+                <Label className="text-[11px] font-medium text-foreground flex items-center gap-1">
+                  <GraduationCap className="w-3 h-3 text-amber-500" />
+                  Class <span className="text-rose-500">*</span>
+                </Label>
+                {selectedClass ? (
+                  <span className="text-[10px] text-emerald-600 font-medium">Set</span>
+                ) : (
+                  <span className="text-[10px] text-muted-foreground">{!selectedBranch ? "Locked" : "Req"}</span>
+                )}
+              </div>
               <Dropdown
                 name="class"
                 value={selectedClass}
                 onChange={(e) => setSelectedClass(e.target.value)}
-                options={classes.length === 0 && selectedBranch ? [{ value: '', label: `${branches.find(b => b.id === selectedBranch || b._id === selectedBranch)?.name || 'Branch'} Classes Not Found` }] : classes.map((c) => ({ value: c.id || c._id, label: c.name }))}
+                options={classes.length === 0 && selectedBranch ? [{ value: '', label: `${selectedBranchObj?.name || 'Branch'} Classes Not Found` }] : classes.map((c) => ({ value: c.id || c._id, label: c.name }))}
                 disabled={!selectedBranch}
-                placeholder={!selectedBranch ? "Select branch first" : classes.length === 0 ? `${branches.find(b => b.id === selectedBranch || b._id === selectedBranch)?.name || 'Branch'} Classes Not Found` : "Select class"}
+                placeholder={!selectedBranch ? "Select branch first" : classes.length === 0 ? "No classes found" : "Select class"}
               />
             </div>
 
-            <div className="space-y-2">
-              <Label>Section *</Label>
+            {/* 4. Section */}
+            <div className={cn("space-y-1", !selectedClass && "opacity-60")}>
+              <div className="flex items-center justify-between text-[11px]">
+                <Label className="text-[11px] font-medium text-foreground flex items-center gap-1">
+                  <Users className="w-3 h-3 text-emerald-500" />
+                  Section <span className="text-rose-500">*</span>
+                </Label>
+                {selectedSection ? (
+                  <span className="text-[10px] text-emerald-600 font-medium">Set</span>
+                ) : (
+                  <span className="text-[10px] text-muted-foreground">{!selectedClass ? "Locked" : "Req"}</span>
+                )}
+              </div>
               <Dropdown
                 name="section"
                 value={selectedSection}
                 onChange={(e) => setSelectedSection(e.target.value)}
-                options={sections.length === 0 && selectedClass ? [{ value: '', label: `${classes.find(c => c.id === selectedClass || c._id === selectedClass)?.name || 'Class'} Sections Not Found` }] : sections.map((s) => ({ value: s.id || s._id || s.name, label: s.name }))}
+                options={sections.length === 0 && selectedClass ? [{ value: '', label: `${selectedClassObj?.name || 'Class'} Sections Not Found` }] : sections.map((s) => ({ value: s.id || s._id || s.name, label: s.name }))}
                 disabled={!selectedClass}
-                placeholder={!selectedClass ? "Select class first" : sections.length === 0 ? `${classes.find(c => c.id === selectedClass || c._id === selectedClass)?.name || 'Class'} Sections Not Found` : "Select section"}
+                placeholder={!selectedClass ? "Select class first" : sections.length === 0 ? "No sections found" : "Select section"}
               />
             </div>
 
-
-
-            <div className="space-y-2">
-              <Label>Attendance Type</Label>
+            {/* 5. Attendance Type */}
+            <div className="space-y-1">
+              <div className="flex items-center justify-between text-[11px]">
+                <Label className="text-[11px] font-medium text-foreground flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-purple-500" />
+                  Type
+                </Label>
+                <span className="text-[10px] text-purple-600 font-medium capitalize">{attendanceType}</span>
+              </div>
               <Dropdown
                 name="attendanceType"
                 value={attendanceType}
                 onChange={(e) => setAttendanceType(e.target.value)}
                 options={[
                   { value: 'daily', label: 'Daily' },
-                  // { value: 'subject', label: 'Subject' },
-                  // { value: 'event', label: 'Event' },
                 ]}
                 placeholder="Select type"
               />
             </div>
           </div>
+
+          {/* Inline Roster indicator */}
+          {selectedBranch && selectedClass && selectedSection && (
+            <div className="mt-2.5 pt-2 border-t border-border/40 flex items-center justify-between text-[11px] text-muted-foreground">
+              <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
+                <CheckCircle className="w-3.5 h-3.5" />
+                <span>Roster active: <strong>{filteredStudents.length}</strong> student{filteredStudents.length !== 1 ? 's' : ''} enrolled</span>
+              </div>
+              <div>
+                Date: <strong className="text-foreground">{new Date(attendanceDate).toLocaleDateString('en-PK', { day: 'numeric', month: 'short', year: 'numeric' })}</strong>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
       {/* Student Search for Manual Marking */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <UserSearch className="w-5 h-5" />
+      <Card className="border border-border bg-card shadow-xs rounded-xl overflow-hidden mb-4">
+        <CardHeader className="p-3.5 sm:p-4 pb-2 border-b border-border/50">
+          <CardTitle className="text-sm font-semibold flex items-center gap-2 text-foreground">
+            <UserSearch className="w-4 h-4 text-primary" />
             Quick Student Search & Mark Attendance
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
+        <CardContent className="p-3.5 sm:p-4">
+          <div className="space-y-3">
             <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search by name, registration #, roll #, email, or phone..."
                 value={studentSearchQuery}
                 onChange={(e) => setStudentSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-9 h-9 text-xs bg-background rounded-lg border-border"
               />
               {searching && (
-                <div className="absolute right-3 top-3">
+                <div className="absolute right-3 top-2.5">
                   <ButtonLoader />
                 </div>
               )}
             </div>
 
             {searchResults.length > 0 && (
-              <div className="border rounded-lg max-h-96 overflow-y-auto">
+              <div className="border border-border rounded-lg max-h-96 overflow-y-auto overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Student</TableHead>
-                      <TableHead>Registration #</TableHead>
-                      <TableHead>Roll #</TableHead>
-                      <TableHead>Section</TableHead>
-                      <TableHead>Branch</TableHead>
-                      <TableHead>Fee Status</TableHead>
-                      <TableHead>Actions</TableHead>
+                    <TableRow className="border-b border-border hover:bg-transparent">
+                      <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Student</TableHead>
+                      <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Registration #</TableHead>
+                      <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Roll #</TableHead>
+                      <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Section</TableHead>
+                      <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Branch</TableHead>
+                      <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Fee Status</TableHead>
+                      <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {searchResults.map((student) => (
-                      <TableRow key={student.id || student._id}>
-                        <TableCell>
+                      <TableRow key={student.id || student._id} className="h-10 hover:bg-muted/30 transition-colors">
+                        <TableCell className="py-2">
                           <div>
-                            <div className="font-medium">{(student.first_name || student.firstName) ? `${student.first_name || student.firstName} ${student.last_name || student.lastName || ''}` : student.fullName}</div>
-                            <div className="text-xs text-gray-500">{student.email}</div>
+                            <div className="font-medium text-xs text-foreground">{(student.first_name || student.firstName) ? `${student.first_name || student.firstName} ${student.last_name || student.lastName || ''}` : student.fullName}</div>
+                            <div className="text-[11px] text-muted-foreground">{student.email}</div>
                           </div>
                         </TableCell>
-                        <TableCell>{student.registration_no || student.registrationNumber || '—'}</TableCell>
-                        <TableCell>{student.roll_no || student.rollNumber || student.details?.academic_info?.roll_no || '—'}</TableCell>
-                        <TableCell>{getSectionName(student.section || student.details?.academic_info?.section_id)}</TableCell>
-
-                        <TableCell>{student.branch?.name || student.branchId?.name || '—'}</TableCell>
-                        <TableCell>
-
+                        <TableCell className="py-2 text-xs font-mono">{student.registration_no || student.registrationNumber || '—'}</TableCell>
+                        <TableCell className="py-2 text-xs font-mono">{student.roll_no || student.rollNumber || student.details?.academic_info?.roll_no || '—'}</TableCell>
+                        <TableCell className="py-2 text-xs">{getSectionName(student.section || student.details?.academic_info?.section_id)}</TableCell>
+                        <TableCell className="py-2 text-xs">{student.branch?.name || student.branchId?.name || '—'}</TableCell>
+                        <TableCell className="py-2">
                           <div className="flex items-center gap-1">
-                            <DollarSign className="w-4 h-4" />
-                            <Badge className={student.hasPaidFees ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
-                              {student.feeStatus || 'unpaid'}
+                            <Badge variant="outline" className={student.hasPaidFees ? 'text-[11px] bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 'text-[11px] bg-rose-500/10 text-rose-600 border-rose-500/20'}>
+                              {student.feeStatus || (student.hasPaidFees ? 'Paid' : 'Unpaid')}
                             </Badge>
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
+                        <TableCell className="py-2 text-right">
+                          <div className="flex justify-end gap-1.5">
                             <Button
                               size="sm"
+                              className="h-7 px-2.5 text-xs font-semibold gap-1 bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
                               onClick={() => markStudentAttendance(student, 'present')}
                               disabled={saving}
                             >
-                              {saving ? <ButtonLoader /> : <CheckCircle className="w-4 h-4 mr-1" />}
+                              {saving ? <ButtonLoader /> : <CheckCircle className="w-3.5 h-3.5" />}
                               Present
                             </Button>
                             <Button
                               size="sm"
                               variant="outline"
+                              className="h-7 px-2 text-xs font-semibold gap-1 border-border"
                               onClick={() => viewStudentAttendance(student.id || student._id)}
                             >
-                              <Eye className="w-4 h-4 mr-1" />
-                              View History
+                              <Eye className="w-3.5 h-3.5" />
+                              History
                             </Button>
-
                           </div>
                         </TableCell>
                       </TableRow>
@@ -1723,9 +1835,9 @@ export default function SuperAdminAttendancePage() {
             )}
 
             {searching && searchResults.length === 0 && (
-              <div className="text-center py-8">
+              <div className="text-center py-6">
                 <ButtonLoader />
-                <p className="text-sm text-gray-500 mt-2">Searching students...</p>
+                <p className="text-xs text-muted-foreground mt-2">Searching students...</p>
               </div>
             )}
           </div>
@@ -1734,65 +1846,67 @@ export default function SuperAdminAttendancePage() {
 
       {/* Marked Students Today */}
       {markedStudents.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Marked Students Today ({markedStudents.length})</CardTitle>
+        <Card className="border border-border bg-card shadow-xs rounded-xl overflow-hidden mb-4">
+          <CardHeader className="p-3.5 sm:p-4 pb-2 border-b border-border/50 flex flex-row items-center justify-between">
+            <CardTitle className="text-sm font-semibold text-foreground">
+              Marked Students Today
+            </CardTitle>
+            <Badge variant="outline" className="text-xs bg-emerald-500/10 text-emerald-600 border-emerald-500/20 font-medium">
+              {markedStudents.length} Marked
+            </Badge>
           </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Student</TableHead>
-                  <TableHead>Registration #</TableHead>
-                  <TableHead>Roll #</TableHead>
-                  <TableHead>Section</TableHead>
-                  <TableHead>Fee Status</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {markedStudents.map((student) => (
-                  <TableRow key={student.id || student._id}>
-
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{student.fullName}</div>
-                        <div className="text-xs text-gray-500">{student.email}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{student.registrationNumber || '—'}</TableCell>
-                    <TableCell>{student.rollNumber || '—'}</TableCell>
-                    <TableCell>{getSectionName(student.section || student.details?.academic_info?.section_id)}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <DollarSign className="w-4 h-4" />
-                        <Badge className={student.hasPaidFees ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
-                          {student.feeStatus || 'unpaid'}
-                        </Badge>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 text-green-600" />
-                        <Badge className="bg-green-100 text-green-800">Present</Badge>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => viewStudentAttendance(student.id || student._id)}
-                      >
-                        <Eye className="w-4 h-4 mr-1" />
-                        View History
-                      </Button>
-
-                    </TableCell>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-b border-border hover:bg-transparent">
+                    <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Student</TableHead>
+                    <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Registration #</TableHead>
+                    <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Roll #</TableHead>
+                    <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Section</TableHead>
+                    <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Fee Status</TableHead>
+                    <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Status</TableHead>
+                    <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider text-right">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {markedStudents.map((student) => (
+                    <TableRow key={student.id || student._id} className="h-10 hover:bg-muted/30 transition-colors">
+                      <TableCell className="py-2">
+                        <div>
+                          <div className="font-medium text-xs text-foreground">{student.fullName}</div>
+                          <div className="text-[11px] text-muted-foreground">{student.email}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-2 text-xs font-mono">{student.registrationNumber || '—'}</TableCell>
+                      <TableCell className="py-2 text-xs font-mono">{student.rollNumber || '—'}</TableCell>
+                      <TableCell className="py-2 text-xs">{getSectionName(student.section || student.details?.academic_info?.section_id)}</TableCell>
+                      <TableCell className="py-2">
+                        <Badge variant="outline" className={student.hasPaidFees ? 'text-[11px] bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 'text-[11px] bg-rose-500/10 text-rose-600 border-rose-500/20'}>
+                          {student.feeStatus || (student.hasPaidFees ? 'Paid' : 'Unpaid')}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="py-2">
+                        <Badge variant="outline" className="text-[11px] bg-emerald-500/10 text-emerald-600 border-emerald-500/20 gap-1 font-medium">
+                          <CheckCircle className="w-3 h-3 text-emerald-600" /> Present
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="py-2 text-right">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-7 px-2 text-xs font-semibold gap-1 border-border"
+                          onClick={() => viewStudentAttendance(student.id || student._id)}
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          History
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       )}
@@ -1811,168 +1925,167 @@ export default function SuperAdminAttendancePage() {
           />
 
           <TabPanel value="manual" activeTab={activeTab}>
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle>Students List</CardTitle>
+            <Card className="border border-border bg-card shadow-xs rounded-xl overflow-hidden">
+              <CardHeader className="p-3.5 sm:p-4 pb-2 border-b border-border/50">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <CardTitle className="text-sm font-semibold text-foreground">Students List</CardTitle>
                   <div className="flex items-center gap-2">
                     <div className="relative">
-                      <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+                      <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
                       <Input
                         placeholder="Search students..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-8 w-64"
+                        className="pl-8 h-8 text-xs w-48 sm:w-64 bg-background rounded-lg border-border"
                       />
                     </div>
-                    <Button onClick={handleSubmit} disabled={saving}>
-                      {saving ? <ButtonLoader /> : <Save className="h-4 w-4 mr-2" />}
+                    <Button onClick={handleSubmit} disabled={saving} size="sm" className="h-8 px-3 rounded-lg text-xs font-semibold gap-1.5 shadow-xs">
+                      {saving ? <ButtonLoader /> : <Save className="h-3.5 w-3.5" />}
                       Save Attendance
                     </Button>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-0">
                 {loading ? (
-                  <div className="text-center py-8">Loading students...</div>
+                  <div className="text-center py-8 text-xs text-muted-foreground">Loading students...</div>
                 ) : filteredStudents.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500 font-medium">
+                  <div className="text-center py-8 text-xs text-muted-foreground font-medium">
                     {selectedBranch ? `${branches.find(b => b.id === selectedBranch || b._id === selectedBranch)?.name || 'Branch'} Students Not Found` : "No students found"}
                   </div>
-
                 ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>GR No.</TableHead>
-                        <TableHead>Reg. No.</TableHead>
-                        <TableHead>Student Name</TableHead>
-                        <TableHead>Status</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredStudents.map(student => {
-                        const studentId = student.id || student._id;
-                        return (
-                          <TableRow key={studentId}>
-                            <TableCell>{student.details?.academic_info?.roll_no || student.rollNumber || student.roll_no || 'N/A'}</TableCell>
-                            <TableCell>{student.registration_no || student.registrationNumber || 'N/A'}</TableCell>
-                            <TableCell className="font-medium">
-                              {student.first_name || student.firstName || ''} {student.last_name || student.lastName || ''}
-                            </TableCell>
-
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  variant={attendanceRecords[studentId] === 'present' ? 'default' : 'outline'}
-                                  size="sm"
-                                  onClick={() => handleStatusChange(studentId, 'present')}
-                                >
-                                  <CheckCircle className="h-4 w-4 mr-1" />
-                                  Present
-                                </Button>
-                                <Button
-                                  variant={attendanceRecords[studentId] === 'absent' ? 'default' : 'outline'}
-                                  size="sm"
-                                  onClick={() => handleStatusChange(studentId, 'absent')}
-                                >
-                                  <XCircle className="h-4 w-4 mr-1" />
-                                  Absent
-                                </Button>
-                                <Button
-                                  variant={attendanceRecords[studentId] === 'late' ? 'default' : 'outline'}
-                                  size="sm"
-                                  onClick={() => handleStatusChange(studentId, 'late')}
-                                >
-                                  <Clock className="h-4 w-4 mr-1" />
-                                  Late
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-
-                    </TableBody>
-                  </Table>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-b border-border hover:bg-transparent">
+                          <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">GR No.</TableHead>
+                          <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Reg. No.</TableHead>
+                          <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Student Name</TableHead>
+                          <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider text-right">Status</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredStudents.map(student => {
+                          const studentId = student.id || student._id;
+                          return (
+                            <TableRow key={studentId} className="h-10 hover:bg-muted/30 transition-colors">
+                              <TableCell className="py-2 text-xs font-mono">{student.details?.academic_info?.roll_no || student.rollNumber || student.roll_no || 'N/A'}</TableCell>
+                              <TableCell className="py-2 text-xs font-mono">{student.registration_no || student.registrationNumber || 'N/A'}</TableCell>
+                              <TableCell className="py-2 font-medium text-xs text-foreground">
+                                {student.first_name || student.firstName || ''} {student.last_name || student.lastName || ''}
+                              </TableCell>
+                              <TableCell className="py-2 text-right">
+                                <div className="flex items-center justify-end gap-1.5">
+                                  <Button
+                                    variant={attendanceRecords[studentId] === 'present' ? 'default' : 'outline'}
+                                    size="sm"
+                                    className={cn("h-7 px-2.5 text-xs font-semibold gap-1", attendanceRecords[studentId] === 'present' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'border-border')}
+                                    onClick={() => handleStatusChange(studentId, 'present')}
+                                  >
+                                    <CheckCircle className="h-3.5 w-3.5" />
+                                    Present
+                                  </Button>
+                                  <Button
+                                    variant={attendanceRecords[studentId] === 'absent' ? 'default' : 'outline'}
+                                    size="sm"
+                                    className={cn("h-7 px-2.5 text-xs font-semibold gap-1", attendanceRecords[studentId] === 'absent' ? 'bg-rose-600 hover:bg-rose-700 text-white' : 'border-border')}
+                                    onClick={() => handleStatusChange(studentId, 'absent')}
+                                  >
+                                    <XCircle className="h-3.5 w-3.5" />
+                                    Absent
+                                  </Button>
+                                  <Button
+                                    variant={attendanceRecords[studentId] === 'late' ? 'default' : 'outline'}
+                                    size="sm"
+                                    className={cn("h-7 px-2.5 text-xs font-semibold gap-1", attendanceRecords[studentId] === 'late' ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'border-border')}
+                                    onClick={() => handleStatusChange(studentId, 'late')}
+                                  >
+                                    <Clock className="h-3.5 w-3.5" />
+                                    Late
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
                 )}
               </CardContent>
             </Card>
           </TabPanel>
 
           <TabPanel value="qr" activeTab={activeTab}>
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle>QR Code Scanner</CardTitle>
+            <Card className="border border-border bg-card shadow-xs rounded-xl overflow-hidden">
+              <CardHeader className="p-3.5 sm:p-4 pb-2 border-b border-border/50">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <CardTitle className="text-sm font-semibold text-foreground">QR Code Scanner</CardTitle>
                   <div className="flex items-center gap-2">
-                    <Button onClick={() => setShowScanner(true)}>
-                      <Camera className="h-4 w-4 mr-2" />
+                    <Button onClick={() => setShowScanner(true)} size="sm" className="h-8 px-3 rounded-lg text-xs font-semibold gap-1.5 shadow-xs bg-indigo-600 hover:bg-indigo-700 text-white">
+                      <Camera className="h-3.5 w-3.5" />
                       Open Scanner
                     </Button>
-                    <Button onClick={handleSubmit} disabled={saving}>
-                      {saving ? <ButtonLoader /> : <Save className="h-4 w-4 mr-2" />}
+                    <Button onClick={handleSubmit} disabled={saving} size="sm" variant="outline" className="h-8 px-3 rounded-lg text-xs font-semibold gap-1.5 border-border">
+                      {saving ? <ButtonLoader /> : <Save className="h-3.5 w-3.5" />}
                       Save Attendance
                     </Button>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-3.5 sm:p-4">
                 <div className="space-y-4">
-                  <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                    <p className="text-sm text-blue-800 dark:text-blue-200">
-                      Click "Open Scanner" to scan multiple student QR codes. The camera will stay open until you close it.
-                      Scanned students will be automatically marked as present.
-                    </p>
+                  <div className="bg-primary/5 border border-primary/20 p-3 rounded-lg text-xs text-foreground/80">
+                    Click &quot;Open Scanner&quot; to scan multiple student QR codes. The camera will stay open until you close it.
+                    Scanned students will be automatically marked as present.
                   </div>
 
                   {scannedStudents.length > 0 && (
                     <div>
-                      <h3 className="font-semibold mb-2">
+                      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                         Scanned Students ({scannedStudents.length})
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                         {scannedStudents.map(student => (
                           <div
                             key={student._id}
-                            className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
+                            className="flex items-center justify-between p-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg"
                           >
                             <div>
-                              <p className="font-medium">
+                              <p className="font-medium text-xs text-foreground">
                                 {student.firstName} {student.lastName}
                               </p>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">
+                              <p className="text-[11px] text-muted-foreground font-mono">
                                 {student.registrationNumber}
                               </p>
                             </div>
-                            <CheckCircle className="h-5 w-5 text-green-600" />
+                            <CheckCircle className="h-4 w-4 text-emerald-600" />
                           </div>
                         ))}
                       </div>
                     </div>
                   )}
 
-                  <div className="border rounded-lg">
+                  <div className="border border-border rounded-lg overflow-x-auto">
                     <Table>
                       <TableHeader>
-                        <TableRow>
-                          <TableHead>GR No.</TableHead>
-                          <TableHead>Reg. No.</TableHead>
-                          <TableHead>Student Name</TableHead>
-                          <TableHead>Status</TableHead>
+                        <TableRow className="border-b border-border hover:bg-transparent">
+                          <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">GR No.</TableHead>
+                          <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Reg. No.</TableHead>
+                          <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Student Name</TableHead>
+                          <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider text-right">Status</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {filteredStudents.map(student => (
-                          <TableRow key={student._id}>
-                            <TableCell>{student.rollNumber || 'N/A'}</TableCell>
-                            <TableCell>{student.registrationNumber}</TableCell>
-                            <TableCell className="font-medium">
+                          <TableRow key={student._id} className="h-10 hover:bg-muted/30 transition-colors">
+                            <TableCell className="py-2 text-xs font-mono">{student.rollNumber || 'N/A'}</TableCell>
+                            <TableCell className="py-2 text-xs font-mono">{student.registrationNumber}</TableCell>
+                            <TableCell className="py-2 font-medium text-xs text-foreground">
                               {student.firstName} {student.lastName}
                             </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                {getStatusIcon(attendanceRecords[student._id])}
+                            <TableCell className="py-2 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
                                 {getStatusBadge(attendanceRecords[student._id])}
                               </div>
                             </TableCell>
@@ -1987,26 +2100,26 @@ export default function SuperAdminAttendancePage() {
           </TabPanel>
 
           <TabPanel value="history" activeTab={activeTab}>
-            <Card>
-              <CardHeader>
-                <CardTitle>Attendance History</CardTitle>
-                <div className="flex gap-4 mt-4">
-                  <div className="space-y-2">
-                    <Label>From Date</Label>
+            <Card className="border border-border bg-card shadow-xs rounded-xl overflow-hidden">
+              <CardHeader className="p-3.5 sm:p-4 pb-2 border-b border-border/50">
+                <CardTitle className="text-sm font-semibold text-foreground">Attendance History</CardTitle>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2.5 mt-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs">From Date</Label>
                     <DatePicker
                       value={historyFilters.fromDate}
                       onChange={(e) => setHistoryFilters(prev => ({ ...prev, fromDate: e.target.value }))}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label>To Date</Label>
+                  <div className="space-y-1">
+                    <Label className="text-xs">To Date</Label>
                     <DatePicker
                       value={historyFilters.toDate}
                       onChange={(e) => setHistoryFilters(prev => ({ ...prev, toDate: e.target.value }))}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label>Branch</Label>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Branch</Label>
                     <Dropdown
                       value={historyFilters.branchId}
                       onChange={(e) => setHistoryFilters(prev => ({ ...prev, branchId: e.target.value }))}
@@ -2014,8 +2127,8 @@ export default function SuperAdminAttendancePage() {
                       placeholder="All branches"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label>Class</Label>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Class</Label>
                     <Dropdown
                       value={historyFilters.classId}
                       onChange={(e) => setHistoryFilters(prev => ({ ...prev, classId: e.target.value }))}
@@ -2023,8 +2136,8 @@ export default function SuperAdminAttendancePage() {
                       placeholder="All classes"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label>Type</Label>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Type</Label>
                     <Dropdown
                       value={historyFilters.attendanceType}
                       onChange={(e) => setHistoryFilters(prev => ({ ...prev, attendanceType: e.target.value }))}
@@ -2038,95 +2151,95 @@ export default function SuperAdminAttendancePage() {
                     />
                   </div>
                   <div className="flex items-end">
-                    <Button onClick={fetchAttendanceHistory} disabled={historyLoading}>
-                      {historyLoading ? <ButtonLoader /> : <Search className="h-4 w-4 mr-2" />}
+                    <Button onClick={fetchAttendanceHistory} disabled={historyLoading} size="sm" className="h-9 w-full rounded-lg text-xs font-semibold gap-1.5 shadow-xs">
+                      {historyLoading ? <ButtonLoader /> : <Search className="h-3.5 w-3.5" />}
                       Search
                     </Button>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-0">
                 {historyLoading ? (
-                  <div className="text-center py-8">Loading attendance history...</div>
+                  <div className="text-center py-8 text-xs text-muted-foreground">Loading attendance history...</div>
                 ) : attendanceHistory.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-xs text-muted-foreground">
                     No attendance records found. Use the filters above to search.
                   </div>
                 ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Branch</TableHead>
-                        <TableHead>Class</TableHead>
-                        <TableHead>Subject/Event</TableHead>
-                        <TableHead>Student</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Marked By</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {attendanceHistory.flatMap(attendance =>
-                        attendance.records.map(record => (
-                          <TableRow key={`${attendance._id}-${record._id}`}>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-gray-500" />
-                                {new Date(attendance.date).toLocaleDateString('en-PK', {
-                                  year: 'numeric',
-                                  month: 'short',
-                                  day: 'numeric'
-                                })}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline" className="capitalize">
-                                {attendance.attendanceType}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>{attendance.branchId?.name || '—'}</TableCell>
-                            <TableCell>{attendance.classId?.name || '—'}</TableCell>
-                            <TableCell>
-                              {attendance.attendanceType === 'subject' && attendance.subjectId?.name}
-                              {attendance.attendanceType === 'event' && attendance.eventId?.title}
-                              {attendance.attendanceType === 'daily' && '—'}
-                            </TableCell>
-                            <TableCell>
-                              <div>
-                                <div className="font-medium">{record.studentId?.fullName || '—'}</div>
-                                <div className="text-xs text-gray-500">{record.studentId?.registrationNumber}</div>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                {getStatusIcon(record.status)}
-                                {getStatusBadge(record.status)}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="text-sm">
-                                <div>{attendance.markedBy?.fullName || '—'}</div>
-                                <div className="text-xs text-gray-500">
-                                  {attendance.markedBy?.email}
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-b border-border hover:bg-transparent">
+                          <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Date</TableHead>
+                          <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Type</TableHead>
+                          <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Branch</TableHead>
+                          <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Class</TableHead>
+                          <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Subject/Event</TableHead>
+                          <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Student</TableHead>
+                          <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Status</TableHead>
+                          <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Marked By</TableHead>
+                          <TableHead className="h-9 bg-muted/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {attendanceHistory.flatMap(attendance =>
+                          attendance.records.map(record => (
+                            <TableRow key={`${attendance._id}-${record._id}`} className="h-10 hover:bg-muted/30 transition-colors">
+                              <TableCell className="py-2 text-xs">
+                                <div className="flex items-center gap-1.5 text-muted-foreground">
+                                  <Calendar className="w-3.5 h-3.5" />
+                                  {new Date(attendance.date).toLocaleDateString('en-PK', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric'
+                                  })}
                                 </div>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleEditStatus(record)}
-                              >
-                                <Eye className="w-4 h-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
+                              </TableCell>
+                              <TableCell className="py-2">
+                                <Badge variant="outline" className="text-[11px] capitalize">
+                                  {attendance.attendanceType}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="py-2 text-xs">{attendance.branchId?.name || '—'}</TableCell>
+                              <TableCell className="py-2 text-xs">{attendance.classId?.name || '—'}</TableCell>
+                              <TableCell className="py-2 text-xs">
+                                {attendance.attendanceType === 'subject' && attendance.subjectId?.name}
+                                {attendance.attendanceType === 'event' && attendance.eventId?.title}
+                                {attendance.attendanceType === 'daily' && '—'}
+                              </TableCell>
+                              <TableCell className="py-2">
+                                <div>
+                                  <div className="font-medium text-xs text-foreground">{record.studentId?.fullName || '—'}</div>
+                                  <div className="text-[11px] text-muted-foreground font-mono">{record.studentId?.registrationNumber}</div>
+                                </div>
+                              </TableCell>
+                              <TableCell className="py-2">
+                                {getStatusBadge(record.status)}
+                              </TableCell>
+                              <TableCell className="py-2">
+                                <div className="text-xs">
+                                  <div className="font-medium text-foreground">{attendance.markedBy?.fullName || '—'}</div>
+                                  <div className="text-[11px] text-muted-foreground">
+                                    {attendance.markedBy?.email}
+                                  </div>
+                                </div>
+                              </TableCell>
+                              <TableCell className="py-2 text-right">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-7 w-7 p-0"
+                                  onClick={() => handleEditStatus(record)}
+                                >
+                                  <Eye className="w-3.5 h-3.5" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
                 )}
               </CardContent>
             </Card>
