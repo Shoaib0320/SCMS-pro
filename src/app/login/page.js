@@ -1,9 +1,8 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/ui/password-input";
 import {
   Card,
   CardContent,
@@ -11,13 +10,25 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Mail, Lock, AlertCircle, Loader, Eye, EyeOff } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  AlertCircle,
+  Loader2,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  ShieldCheck,
+  ArrowLeft,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 
 export default function LoginPage() {
   const [loginValue, setLoginValue] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [adminContacts, setAdminContacts] = useState([]);
@@ -75,135 +86,196 @@ export default function LoginPage() {
     }
   };
 
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-xl border border-gray-100 overflow-hidden">
-              <img
-                src="/logo.png"
-                alt="SCMS Pro Logo"
-                className="w-16 h-16 object-contain"
-              />
-            </div>
+    <div className="min-h-screen relative flex flex-col items-center justify-center p-4 sm:p-6 bg-background selection:bg-indigo-500 selection:text-white">
+      {/* Subtle Ambient Light (Clean & Minimal) */}
+      <div className="absolute top-0 inset-x-0 h-96 bg-linear-to-b from-indigo-500/10 via-purple-500/5 to-transparent pointer-events-none" />
+      <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Top Bar Navigation */}
+      <div className="w-full max-w-[410px] mb-4 flex items-center justify-between text-xs text-muted-foreground z-10">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Back to Home</span>
+        </Link>
+        <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground/80">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+          System Active
+        </span>
+      </div>
+
+      {/* Centered Login Card */}
+      <Card className="w-full max-w-[410px] border border-border/80 bg-card/95 shadow-xl shadow-indigo-500/5 rounded-2xl relative z-10 overflow-hidden">
+        {/* Sleek Top Accent Line */}
+        <div className="h-1 w-full bg-linear-to-r from-indigo-500 via-indigo-600 to-purple-600" />
+
+        <CardHeader className="pt-7 pb-4 px-6 text-center space-y-1.5">
+          {/* Logo Mark */}
+          <div className="w-14 h-14 rounded-2xl bg-white dark:bg-card border border-border/80 shadow-xs flex items-center justify-center p-2.5 mx-auto mb-2">
+            <img
+              src="/logo.png"
+              alt="SCMS Pro Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">SCMS Pro</h1>
-          <p className="text-gray-600 mt-2">Coaching Management System</p>
-        </div>
 
-        {/* Login Card */}
-        <Card className="shadow-lg border-gray-200">
-          <CardHeader className="pb-6">
-            <CardTitle className="text-xl font-semibold text-gray-900">
-              Welcome Back
-            </CardTitle>
-            <CardDescription className="text-gray-600">
-              Sign in to your account to continue
-            </CardDescription>
-          </CardHeader>
+          <CardTitle className="text-xl font-bold tracking-tight text-foreground">
+            Sign in to SCMS Pro
+          </CardTitle>
+          <CardDescription className="text-xs text-muted-foreground">
+            Enter your email or registration number to access your account
+          </CardDescription>
+        </CardHeader>
 
-          <CardContent className="space-y-5">
-            {/* Error Message */}
-            {error && (
-              <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md">
-                <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />
-                <p className="text-sm text-red-700">{error}</p>
-              </div>
-            )}
+        <CardContent className="px-6 pb-7 space-y-4">
+          {/* Error Message */}
+          {error && (
+            <div className="flex items-start gap-2 p-3 bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 rounded-xl text-xs">
+              <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+              <p className="flex-1 font-medium">{error}</p>
+              <button
+                type="button"
+                onClick={() => setError("")}
+                className="text-rose-500 hover:text-rose-700 dark:hover:text-rose-300"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
 
-            {/* Login Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <label
-                  htmlFor="login"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Login ID (Email or Reg No)
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="login"
-                    type="text"
-                    placeholder="Enter email or registration number"
-                    value={loginValue}
-                    onChange={(e) => setLoginValue(e.target.value)}
-                    className="pl-9"
-                    disabled={loading}
-                  />
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-3.5">
+            {/* Login ID Input */}
+            <div className="space-y-1.5">
+              <label
+                htmlFor="login"
+                className="text-xs font-semibold text-foreground flex items-center justify-between"
+              >
+                <span>Login ID</span>
+                <span className="text-[10px] text-muted-foreground font-normal">
+                  Email or Reg No
+                </span>
+              </label>
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+                  <Mail className="h-4 w-4" />
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex justify-between items-center px-0.5">
-                  <Link
-                    href="/auth/forgot-password"
-                    className="text-xs text-primary ml-auto mb-1"
+                <input
+                  id="login"
+                  type="text"
+                  placeholder="name@example.com or REG-1001"
+                  value={loginValue}
+                  onChange={(e) => setLoginValue(e.target.value)}
+                  disabled={loading}
+                  className="w-full h-10 pl-9 pr-8 text-xs sm:text-sm bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                />
+                {loginValue && !loading && (
+                  <button
+                    type="button"
+                    onClick={() => setLoginValue("")}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    title="Clear"
                   >
-                    Forgot password?
-                  </Link>
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Password Input */}
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center">
+                <label
+                  htmlFor="password"
+                  className="text-xs font-semibold text-foreground"
+                >
+                  Password
+                </label>
+                <Link
+                  href="/auth/forgot-password"
+                  className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline"
+                >
+                  Forgot?
+                </Link>
+              </div>
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+                  <Lock className="h-4 w-4" />
                 </div>
-                <PasswordInput
+                <input
                   id="password"
-                  placeholder="Enter your password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading}
-                  label="Password"
+                  className="w-full h-10 pl-9 pr-9 text-xs sm:text-sm bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-mono"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                  title={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
               </div>
+            </div>
 
-              <Button
-                type="submit"
-                className="w-full text-white"
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <Loader className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
-                  </>
-                ) : (
-                  "Sign In"
-                )}
-              </Button>
-            </form>
+            {/* Remember Me */}
+            <div className="flex items-center justify-between pt-0.5">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-3.5 h-3.5 rounded text-indigo-600 border-border focus:ring-indigo-500"
+                />
+                <span className="text-xs text-muted-foreground">
+                  Remember this device
+                </span>
+              </label>
+            </div>
 
-            {/* {adminContacts.length > 0 && (
-              <div className="rounded-md border border-blue-100 bg-blue-50 p-3">
-                <p className="text-sm font-semibold text-blue-900">Admin Details</p>
-                <div className="mt-2 space-y-1">
-                  {adminContacts.map((admin) => (
-                    <p key={admin.id} className="text-xs text-blue-800">
-                      {admin.first_name} {admin.last_name} ({admin.role}) - {admin.email || "No email"}
-                    </p>
-                  ))}
-                </div>
-              </div>
-            )} */}
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full h-10 text-xs sm:text-sm font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs active:scale-[0.99] transition-all"
+            >
+              {loading ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Signing in...</span>
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5">
+                  <span>Sign In</span>
+                  <ArrowRight className="h-4 w-4" />
+                </span>
+              )}
+            </Button>
+          </form>
 
-          </CardContent>
-        </Card>
-
-        {/* Features */}
-        <div className="mt-8 grid grid-cols-3 gap-3">
-          <div className="text-center">
-            <div className="text-gray-700 text-lg mb-1">👥</div>
-            <p className="text-xs text-gray-500">Multi-Role</p>
+          {/* Subtle Security Badge */}
+          <div className="flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground/80 pt-2 border-t border-border/50">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+            <span>256-Bit Secure SSL Connection</span>
           </div>
-          <div className="text-center">
-            <div className="text-gray-700 text-lg mb-1">🔒</div>
-            <p className="text-xs text-gray-500">Secure</p>
-          </div>
-          <div className="text-center">
-            <div className="text-gray-700 text-lg mb-1">⚡</div>
-            <p className="text-xs text-gray-500">Fast</p>
-          </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
+
+      {/* Minimal Footer */}
+      <p className="text-[11px] text-muted-foreground mt-4 text-center z-10">
+        SCMS Pro • Educational Center Management System
+      </p>
     </div>
   );
 }

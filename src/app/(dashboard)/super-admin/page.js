@@ -5,17 +5,13 @@ import { useApi } from '@/hooks/useApi';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
-import Dropdown from '@/components/ui/dropdown';
 import { Input } from '@/components/ui/input';
 import FullPageLoader from '@/components/ui/full-page-loader';
 import Skeleton, { CardSkeleton, TableSkeleton } from '@/components/ui/skeleton';
-import SuperAdminStudentTrends from '@/components/dashboard/SuperAdminStudentTrends';
-import SuperAdminClassWiseStudents from '@/components/dashboard/SuperAdminClassWiseStudents';
-import SuperAdminBranchWiseStudents from '@/components/dashboard/SuperAdminBranchWiseStudents';
-import SuperAdminStudentAttendance from '@/components/dashboard/SuperAdminStudentAttendance';
-import SuperAdminMonthlyFeeCollection from '@/components/dashboard/SuperAdminMonthlyFeeCollection';
-import SuperAdminPassFailRatio from '@/components/dashboard/SuperAdminPassFailRatio';
+import { cn } from '@/lib/utils';
+import SuperAdminAnalyticsSection from '@/components/dashboard/SuperAdminAnalyticsSection';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
+import DashboardFilterPopover from '@/components/dashboard/DashboardFilterPopover';
 import StatsCard from '@/components/dashboard/StatsCard';
 import QuickActions from '@/components/dashboard/QuickActions';
 import { API_ENDPOINTS } from '@/constants/api-endpoints';
@@ -161,34 +157,31 @@ function SuperAdminDashboard() {
 
   if (loading && !dashboardData.headerStats.totalBranches) {
     return (
-      <div className="p-4 md:p-6 space-y-6 min-h-screen">
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pt-8">
-           <div className="space-y-2">
-              <Skeleton className="h-10 w-64" />
-              <Skeleton className="h-4 w-96" />
+      <div className="space-y-4">
+        <div className="flex items-center justify-between gap-3 mb-2.5 pb-1.5 border-b border-border/50">
+           <div className="space-y-1">
+              <Skeleton className="h-7 w-56 rounded-md" />
+              <Skeleton className="h-3.5 w-64 rounded-md" />
            </div>
-           <div className="flex gap-3">
-              <Skeleton className="h-10 w-32 rounded-lg" />
-              <Skeleton className="h-10 w-32 rounded-lg" />
-              <Skeleton className="h-10 w-32 rounded-lg" />
+           <div className="flex items-center gap-2">
+              <Skeleton className="h-8 w-20 rounded-lg" />
+              <Skeleton className="h-8 w-20 rounded-lg" />
            </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
-           <Skeleton className="h-32 rounded-2xl" />
-           <Skeleton className="h-32 rounded-2xl" />
-           <Skeleton className="h-32 rounded-2xl" />
-           <Skeleton className="h-32 rounded-2xl" />
-           <Skeleton className="h-32 rounded-2xl" />
-           <Skeleton className="h-32 rounded-2xl" />
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5">
+           <Skeleton className="h-20 rounded-xl" />
+           <Skeleton className="h-20 rounded-xl" />
+           <Skeleton className="h-20 rounded-xl" />
+           <Skeleton className="h-20 rounded-xl" />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-           <Skeleton className="h-80 rounded-2xl" />
-           <Skeleton className="h-80 rounded-2xl" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+           <Skeleton className="h-64 rounded-xl" />
+           <Skeleton className="h-64 rounded-xl" />
         </div>
 
-        <Skeleton className="h-96 rounded-2xl" />
+        <Skeleton className="h-64 rounded-xl" />
       </div>
     );
   }
@@ -204,42 +197,24 @@ function SuperAdminDashboard() {
   const summary = dashboardData?.summary || {};
 
   return (
-    <div className="p-4 md:p-6 space-y-6  dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 min-h-screen">
+    <div className="space-y-4">
       {/* Header */}
       <DashboardHeader 
         title="Super Admin Dashboard"
-        subtitle="Comprehensive overview of all branches, users, and system performance"
+        subtitle="Overview of branches, personnel, academics, and finances"
         onRefresh={loadDashboardData}
       >
-        <Dropdown
-          value={selectedTimeRange}
-          onChange={(e) => setSelectedTimeRange(e.target.value)}
-          options={[
-            { value: '7days', label: 'Last 7 Days' },
-            { value: '30days', label: 'Last 30 Days' },
-            { value: '90days', label: 'Last 90 Days' },
-            { value: '1year', label: 'Last Year' }
-          ]}
-          placeholder="Select Time Range"
-          className="min-w-[140px]"
-        />
-        <Dropdown
-          value={selectedBranch}
-          onChange={(e) => setSelectedBranch(e.target.value)}
-          options={[
-            { value: 'all', label: 'All Branches' },
-            ...branchPerformance.map(branch => ({
-              value: branch.id,
-              label: branch.name
-            }))
-          ]}
-          placeholder="Select Branch"
-          className="min-w-[140px]"
+        <DashboardFilterPopover
+          selectedTimeRange={selectedTimeRange}
+          onTimeRangeChange={setSelectedTimeRange}
+          selectedBranch={selectedBranch}
+          onBranchChange={setSelectedBranch}
+          branches={branchPerformance}
         />
       </DashboardHeader>
 
       {/* Key Metrics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5">
         <StatsCard 
           title="Total Branches"
           value={formatNumber(headerStats.totalBranches || 0)}
@@ -302,70 +277,110 @@ function SuperAdminDashboard() {
       </div>
 
       {/* Performance Metrics & System Overview */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Performance Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="w-5 h-5" />
-              Performance Metrics
-            </CardTitle>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5 sm:gap-4 items-stretch">
+        {/* Performance Metrics */}
+        <Card className="border border-border bg-card shadow-xs flex flex-col justify-between">
+          <CardHeader className="p-3.5 sm:p-4 pb-2 border-b border-border/50">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-foreground">
+                <div className="w-6 h-6 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                  <Activity className="w-3.5 h-3.5" />
+                </div>
+                Performance & Health Metrics
+              </CardTitle>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/40">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse" />
+                System Optimal
+              </span>
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              
-              <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <UserCheck className="w-5 h-5 text-blue-500" />
-                  <span className="text-sm font-medium">Average Attendance</span>
+          <CardContent className="p-3.5 sm:p-4 space-y-2.5 flex-1 flex flex-col justify-between">
+            {/* 1. Average Attendance */}
+            <div className="p-2.5 rounded-xl border border-border/70 bg-secondary/30 hover:bg-secondary/50 transition-colors">
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                    <UserCheck className="w-3.5 h-3.5" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-semibold text-foreground">Average Attendance</span>
+                    <p className="text-[10px] text-muted-foreground">Across all enrolled students</p>
+                  </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg font-bold">{performanceMetrics.avgAttendance || 0}%</div>
-                  <div className={`text-xs flex items-center gap-1 ${getChangeColor(performanceMetrics.attendanceChange)}`}>
+                  <div className="text-sm font-bold text-foreground">{performanceMetrics.avgAttendance || 0}%</div>
+                  <div className={cn("text-[10px] font-semibold flex items-center justify-end gap-0.5", getChangeColor(performanceMetrics.attendanceChange))}>
                     {getChangeIcon(performanceMetrics.attendanceChange)}
-                    {Math.abs(performanceMetrics.attendanceChange || 0)}%
+                    <span>{Math.abs(performanceMetrics.attendanceChange || 0)}%</span>
                   </div>
                 </div>
               </div>
+              <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                <div 
+                  className="bg-blue-600 h-full rounded-full transition-all duration-500" 
+                  style={{ width: `${Math.min(100, Math.max(0, performanceMetrics.avgAttendance || 0))}%` }} 
+                />
+              </div>
+            </div>
 
-              <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Target className="w-5 h-5 text-green-500" />
-                  <span className="text-sm font-medium">Pass Percentage</span>
+            {/* 2. Pass Percentage */}
+            <div className="p-2.5 rounded-xl border border-border/70 bg-secondary/30 hover:bg-secondary/50 transition-colors">
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                    <Target className="w-3.5 h-3.5" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-semibold text-foreground">Pass Percentage</span>
+                    <p className="text-[10px] text-muted-foreground">Examination benchmark</p>
+                  </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg font-bold">{performanceMetrics.passPercentage || 0}%</div>
-                  <div className={`text-xs flex items-center gap-1 ${getChangeColor(performanceMetrics.passChange)}`}>
+                  <div className="text-sm font-bold text-foreground">{performanceMetrics.passPercentage || 0}%</div>
+                  <div className={cn("text-[10px] font-semibold flex items-center justify-end gap-0.5", getChangeColor(performanceMetrics.passChange))}>
                     {getChangeIcon(performanceMetrics.passChange)}
-                    {Math.abs(performanceMetrics.passChange || 0)}%
+                    <span>{Math.abs(performanceMetrics.passChange || 0)}%</span>
                   </div>
                 </div>
               </div>
+              <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                <div 
+                  className="bg-emerald-600 h-full rounded-full transition-all duration-500" 
+                  style={{ width: `${Math.min(100, Math.max(0, performanceMetrics.passPercentage || 0))}%` }} 
+                />
+              </div>
+            </div>
 
-              <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Zap className="w-5 h-5 text-yellow-500" />
-                  <span className="text-sm font-medium">API Response Time</span>
-                </div>
-                <div className="text-right">
-                  <div className="text-lg font-bold">{performanceMetrics.apiResponseTime || 0}ms</div>
-                  <div className={`text-xs flex items-center gap-1 ${getChangeColor(performanceMetrics.responseChange)}`}>
+            {/* 3. Bottom Row: 2 Mini KPI Tiles */}
+            <div className="grid grid-cols-2 gap-2">
+              <div className="p-2.5 rounded-xl border border-border/70 bg-secondary/30">
+                <div className="flex items-center justify-between">
+                  <div className="w-5 h-5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                    <Zap className="w-3 h-3" />
+                  </div>
+                  <span className={cn("text-[10px] font-semibold flex items-center gap-0.5", getChangeColor(performanceMetrics.responseChange))}>
                     {getChangeIcon(performanceMetrics.responseChange)}
-                    {Math.abs(performanceMetrics.responseChange || 0)}%
-                  </div>
+                    <span>{Math.abs(performanceMetrics.responseChange || 0)}%</span>
+                  </span>
+                </div>
+                <div className="mt-1">
+                  <div className="text-sm font-bold text-foreground">{performanceMetrics.apiResponseTime || 0}ms</div>
+                  <span className="text-[10px] text-muted-foreground truncate block">API Latency</span>
                 </div>
               </div>
 
-              <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Database className="w-5 h-5 text-purple-500" />
-                  <span className="text-sm font-medium">Total Attendance Records</span>
-                </div>
-                <div className="text-right">
-                  <div className="text-lg font-bold">{formatNumber(performanceMetrics.totalAttendanceRecords || 0)}</div>
-                  <div className="text-xs text-gray-500">
-                    {performanceMetrics.presentCount || 0} present, {performanceMetrics.absentCount || 0} absent
+              <div className="p-2.5 rounded-xl border border-border/70 bg-secondary/30">
+                <div className="flex items-center justify-between">
+                  <div className="w-5 h-5 rounded-md bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                    <Database className="w-3 h-3" />
                   </div>
+                  <span className="text-[9px] text-muted-foreground font-medium">
+                    {performanceMetrics.presentCount || 0}P / {performanceMetrics.absentCount || 0}A
+                  </span>
+                </div>
+                <div className="mt-1">
+                  <div className="text-sm font-bold text-foreground">{formatNumber(performanceMetrics.totalAttendanceRecords || 0)}</div>
+                  <span className="text-[10px] text-muted-foreground truncate block">Attendance Logs</span>
                 </div>
               </div>
             </div>
@@ -373,61 +388,89 @@ function SuperAdminDashboard() {
         </Card>
 
         {/* System Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <PieChart className="w-5 h-5" />
-              System Overview
-            </CardTitle>
+        <Card className="border border-border bg-card shadow-xs flex flex-col justify-between">
+          <CardHeader className="p-3.5 sm:p-4 pb-2 border-b border-border/50">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-foreground">
+                <div className="w-6 h-6 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                  <PieChart className="w-3.5 h-3.5" />
+                </div>
+                System & Operations Overview
+              </CardTitle>
+              <span className="text-[10px] text-muted-foreground font-medium">
+                Live Overview
+              </span>
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{summary.totalUsers || 0}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Total Users</div>
+          <CardContent className="p-3.5 sm:p-4 space-y-2.5 flex-1 flex flex-col justify-between">
+            {/* Top Stat Pills Grid (Users, Staff, Exams, Events) */}
+            <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
+              <div className="p-2 rounded-xl border border-blue-200/50 dark:border-blue-800/30 bg-blue-50/60 dark:bg-blue-950/20 text-center">
+                <div className="text-sm sm:text-base font-bold text-blue-600 dark:text-blue-400 leading-tight">{formatNumber(summary.totalUsers || 0)}</div>
+                <div className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider mt-0.5 truncate">Users</div>
               </div>
-              <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">{summary.totalStaff || 0}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Total Staff</div>
+              <div className="p-2 rounded-xl border border-emerald-200/50 dark:border-emerald-800/30 bg-emerald-50/60 dark:bg-emerald-950/20 text-center">
+                <div className="text-sm sm:text-base font-bold text-emerald-600 dark:text-emerald-400 leading-tight">{formatNumber(summary.totalStaff || 0)}</div>
+                <div className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider mt-0.5 truncate">Staff</div>
               </div>
-              <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{summary.totalEvents || 0}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Events</div>
+              <div className="p-2 rounded-xl border border-purple-200/50 dark:border-purple-800/30 bg-purple-50/60 dark:bg-purple-950/20 text-center">
+                <div className="text-sm sm:text-base font-bold text-purple-600 dark:text-purple-400 leading-tight">{formatNumber(summary.totalEvents || 0)}</div>
+                <div className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider mt-0.5 truncate">Events</div>
               </div>
-              <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{summary.totalExams || 0}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Exams</div>
+              <div className="p-2 rounded-xl border border-amber-200/50 dark:border-amber-800/30 bg-amber-50/60 dark:bg-amber-950/20 text-center">
+                <div className="text-sm sm:text-base font-bold text-amber-600 dark:text-amber-400 leading-tight">{formatNumber(summary.totalExams || 0)}</div>
+                <div className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider mt-0.5 truncate">Exams</div>
               </div>
             </div>
 
-            <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-blue-500" />
+            {/* Bottom 4 Operational Rows */}
+            <div className="space-y-1.5 pt-2 border-t border-border/50">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors">
+                <span className="text-xs font-medium text-foreground flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-md bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                    <Calendar className="w-3 h-3" />
+                  </div>
                   Upcoming Events
                 </span>
-                <span className="text-lg font-bold">{headerStats.upcomingEvents || 0}</span>
+                <span className="text-xs font-bold text-foreground px-2 py-0.5 rounded-md bg-secondary border border-border/60">
+                  {headerStats.upcomingEvents || 0}
+                </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium flex items-center gap-2">
-                  <FileCheck className="w-4 h-4 text-green-500" />
+
+              <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors">
+                <span className="text-xs font-medium text-foreground flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-md bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                    <FileCheck className="w-3 h-3" />
+                  </div>
                   Scheduled Exams
                 </span>
-                <span className="text-lg font-bold">{headerStats.scheduledExams || 0}</span>
+                <span className="text-xs font-bold text-foreground px-2 py-0.5 rounded-md bg-secondary border border-border/60">
+                  {headerStats.scheduledExams || 0}
+                </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium flex items-center gap-2">
-                  <Wallet className="w-4 h-4 text-red-500" />
+
+              <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors">
+                <span className="text-xs font-medium text-foreground flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-md bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+                    <Wallet className="w-3 h-3" />
+                  </div>
                   Pending Expenses
                 </span>
-                <span className="text-lg font-bold">{formatCurrency(headerStats.pendingExpenses || 0)}</span>
+                <span className="text-xs font-bold text-rose-600 dark:text-rose-400 px-2 py-0.5 rounded-md bg-rose-50 dark:bg-rose-950/30 border border-rose-200/50">
+                  {formatCurrency(headerStats.pendingExpenses || 0)}
+                </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium flex items-center gap-2">
-                  <Bell className="w-4 h-4 text-yellow-500" />
+
+              <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors">
+                <span className="text-xs font-medium text-foreground flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-md bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                    <Bell className="w-3 h-3" />
+                  </div>
                   Unread Notifications
                 </span>
-                <span className="text-lg font-bold">{headerStats.unreadNotifications || 0}</span>
+                <span className="text-xs font-bold text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200/50">
+                  {headerStats.unreadNotifications || 0}
+                </span>
               </div>
             </div>
           </CardContent>
@@ -563,50 +606,24 @@ function SuperAdminDashboard() {
       </div>
 
       <QuickActions 
+        title="Quick Actions"
         actions={[
-          { title: "Attendance", icon: CheckCircle, color: "text-emerald-600", onClick: () => router.push('/super-admin/attendance') },
-          { title: "Manage Users", icon: Users, color: "text-blue-600", onClick: () => router.push('/super-admin/student-management/students') },
-          { title: "Branch Settings", icon: Building2, color: "text-green-600", onClick: () => router.push('/super-admin/branches') },
-          { title: "Reports", icon: FileText, color: "text-purple-600", onClick: () => router.push('/super-admin/reports') },
-          { title: "Notifications", icon: Bell, color: "text-yellow-600", onClick: () => router.push('/super-admin/notifications') },
-          { title: "Expenses", icon: Receipt, color: "text-red-600", onClick: () => router.push('/super-admin/expenses') },
-          { title: "Events", icon: Calendar, color: "text-indigo-600", onClick: () => router.push('/super-admin/academic-years') },
+          { title: "Attendance", subtitle: "Mark & Track", icon: CheckCircle, category: "Academic", onClick: () => router.push('/super-admin/attendance') },
+          { title: "Students", subtitle: "Profiles & List", icon: Users, category: "Personnel", onClick: () => router.push('/super-admin/student-management/students') },
+          { title: "Branches", subtitle: "Campuses & Units", icon: Building2, category: "Management", onClick: () => router.push('/super-admin/branch-management/branches') },
+          { title: "Fee Vouchers", subtitle: "Challan & Ledger", icon: Receipt, category: "Finance", onClick: () => router.push('/super-admin/fee-vouchers') },
+          { title: "Expenses", subtitle: "Bills & Accounts", icon: Wallet, category: "Finance", onClick: () => router.push('/super-admin/expenses') },
+          { title: "Reports", subtitle: "Financial & Stats", icon: FileText, category: "Finance", onClick: () => router.push('/super-admin/reports') },
+          { title: "Notifications", subtitle: "Alerts & Notices", icon: Bell, category: "System", onClick: () => router.push('/super-admin/notifications') },
         ]}
       />
 
-      {/* Analytics Charts */}
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Analytics Overview</h2>
-          <Button
-            onClick={fetchChartData}
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-2"
-          >
-            <RefreshCw className="w-4 h-4" />
-            <span className="hidden sm:inline">Refresh Charts</span>
-          </Button>
-        </div>
-
-        {/* Row 1: Student Trends and Class-wise Students Count */}
-        <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
-          <SuperAdminStudentTrends selectedBranch={selectedBranch} branchPerformance={branchPerformance} />
-          <SuperAdminClassWiseStudents selectedBranch={selectedBranch} branchPerformance={branchPerformance} />
-        </div>
-
-        {/* Row 2: Branch-wise Students and Student Attendance Percentage */}
-        <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
-          <SuperAdminBranchWiseStudents selectedBranch={selectedBranch} branchPerformance={branchPerformance} />
-          <SuperAdminStudentAttendance selectedBranch={selectedBranch} branchPerformance={branchPerformance} />
-        </div>
-
-        {/* Row 3: Monthly Fee Collection and Pass vs Fail Ratio */}
-        <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
-          <SuperAdminMonthlyFeeCollection selectedBranch={selectedBranch} branchPerformance={branchPerformance} />
-          <SuperAdminPassFailRatio selectedBranch={selectedBranch} branchPerformance={branchPerformance} />
-        </div>
-      </div>
+      {/* Analytics Charts Section (Interactive Tab Selector) */}
+      <SuperAdminAnalyticsSection
+        selectedBranch={selectedBranch}
+        branchPerformance={branchPerformance}
+        onRefreshCharts={fetchChartData}
+      />
     </div>
   );
 }

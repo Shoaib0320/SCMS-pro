@@ -12,8 +12,10 @@ import {
   Search, Building2, BookOpen, Users, BarChart2,
   ChevronDown, ChevronRight, TrendingUp, TrendingDown,
   Award, AlertCircle, CheckCircle2, XCircle, Clock,
-  RefreshCw, Eye
+  RefreshCw, Eye, RotateCcw, X
 } from "lucide-react";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import StatsCard from "@/components/dashboard/StatsCard";
 import ExamDetailsModal from "@/components/modals/ExamDetailsModal";
 import { ExamSkeleton } from "@/components/ui/skeleton";
 
@@ -195,76 +197,127 @@ export default function SuperAdminExamsPage() {
   if (loading) return <ExamSkeleton />;
 
   return (
-    <div className="p-4 sm:p-6 space-y-6">
+    <div className="space-y-4">
 
       {/* ── Page Header ─────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Exam Overview</h1>
-          <p className="text-sm text-slate-500 mt-0.5">Branch-wise examination monitoring dashboard</p>
-        </div>
-        <Button variant="outline" size="sm" onClick={fetchExams} className="self-start sm:self-auto">
-          <RefreshCw className="w-4 h-4 mr-2" /> Refresh
-        </Button>
-      </div>
+      <DashboardHeader
+        title="Examination Management"
+        subtitle="Branch-wise examination monitoring and student performance analytics"
+        onRefresh={fetchExams}
+      />
 
       {/* ── Summary KPI Cards ────────────────────────────────────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        {[
-          { label: "Branches",  value: topStats.branches,  icon: Building2,    bg: "bg-indigo-50",   ic: "text-indigo-600" },
-          { label: "Total Exams", value: topStats.total,    icon: BookOpen,     bg: "bg-slate-50",    ic: "text-slate-600"  },
-          { label: "Scheduled", value: topStats.scheduled, icon: Clock,        bg: "bg-amber-50",    ic: "text-amber-600"  },
-          { label: "Ongoing",   value: topStats.ongoing,   icon: TrendingUp,   bg: "bg-blue-50",     ic: "text-blue-600"   },
-          { label: "Completed", value: topStats.completed, icon: CheckCircle2, bg: "bg-emerald-50",  ic: "text-emerald-600"},
-        ].map(stat => (
-          <Card key={stat.label} className={`${stat.bg} border-0 shadow-none`}>
-            <CardContent className="p-4 flex items-center gap-3">
-              <stat.icon className={`w-5 h-5 ${stat.ic} shrink-0`} />
-              <div>
-                <p className="text-2xl font-black text-slate-900">{stat.value}</p>
-                <p className="text-xs text-slate-500 font-medium leading-tight">{stat.label}</p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-3.5">
+        <StatsCard 
+          title="Total Exams"
+          value={topStats.total}
+          icon={BookOpen}
+          description="System examinations"
+          color="blue"
+        />
+        <StatsCard 
+          title="Campuses"
+          value={topStats.branches}
+          icon={Building2}
+          description="Participating branches"
+          color="purple"
+        />
+        <StatsCard 
+          title="Scheduled"
+          value={topStats.scheduled}
+          icon={Clock}
+          description="Upcoming exams"
+          color="orange"
+        />
+        <StatsCard 
+          title="Ongoing"
+          value={topStats.ongoing}
+          icon={TrendingUp}
+          description="In-progress exams"
+          color="green"
+        />
+        <StatsCard 
+          title="Completed"
+          value={topStats.completed}
+          icon={CheckCircle2}
+          description="Concluded exams"
+          color="emerald"
+        />
       </div>
 
-      {/* ── Filters ─────────────────────────────────────────────── */}
-      <div className="flex flex-wrap gap-3">
-        <div className="relative flex-1 min-w-[220px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-          <input
-            placeholder="Search exams…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="w-full h-10 pl-9 pr-3 text-sm text-slate-800 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          />
+      {/* ── Compact Filter Toolbar ─────────────────────────────────────────── */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 p-2.5 rounded-xl border border-border bg-card shadow-xs">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-1">
+          {/* Search Input */}
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+            <input
+              placeholder="Search exams…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full h-8 pl-8 pr-8 text-xs rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors"
+            />
+            {search && (
+              <button
+                onClick={() => setSearch('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+
+          {/* Branch Filter */}
+          <div className="w-full sm:w-48">
+            <select
+              value={branchFilter}
+              onChange={e => setBranchFilter(e.target.value)}
+              className="w-full h-8 px-2 text-xs rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors cursor-pointer"
+            >
+              <option value="all">All Branches</option>
+              {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+            </select>
+          </div>
+
+          {/* Reset Filters */}
+          {(search || branchFilter !== 'all') && (
+            <button
+              onClick={() => {
+                setSearch('');
+                setBranchFilter('all');
+              }}
+              className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 cursor-pointer transition-colors"
+              title="Reset filters"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Reset</span>
+            </button>
+          )}
         </div>
-        <select
-          value={branchFilter}
-          onChange={e => setBranchFilter(e.target.value)}
-          className="h-10 px-3 text-sm text-slate-800 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        >
-          <option value="all">All Branches</option>
-          {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-        </select>
+
+        {/* Results counter */}
+        <div className="text-right flex items-center justify-between sm:justify-end gap-2">
+          <span className="text-[11px] font-medium text-muted-foreground">
+            {byBranch.reduce((acc, b) => acc + b.exams.length, 0)} exams listed
+          </span>
+        </div>
       </div>
 
       {/* ── Branch-wise Accordion ────────────────────────────────── */}
       {byBranch.length === 0 ? (
-        <div className="py-20 text-center text-slate-400 flex flex-col items-center gap-2">
-          <BookOpen className="w-10 h-10 opacity-20" />
-          <p>No exams found</p>
+        <div className="py-16 text-center text-muted-foreground flex flex-col items-center gap-2 bg-card rounded-xl border border-border shadow-xs">
+          <BookOpen className="w-10 h-10 opacity-30" />
+          <p className="text-sm font-medium">No exams found matching your filter criteria</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {byBranch.map(branch => {
             const isOpen = expandedBranch === branch.id;
             const branchExamCount = branch.exams.length;
             const branchCompleted = branch.exams.filter(e => e.status === "completed").length;
 
             return (
-              <Card key={branch.id} className="overflow-hidden border shadow-sm">
+              <Card key={branch.id} className="overflow-hidden border border-border bg-card shadow-xs">
                 {/* Branch Header — click to expand */}
                 <button
                   onClick={() => {
@@ -272,22 +325,22 @@ export default function SuperAdminExamsPage() {
                     setExpandedBranch(next);
                     if (next) branch.exams.forEach(e => loadExamDetails(e));
                   }}
-                  className="w-full text-left"
+                  className="w-full text-left cursor-pointer"
                 >
-                  <div className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-lg bg-indigo-100 flex items-center justify-center shrink-0">
-                        <Building2 className="w-5 h-5 text-indigo-600" />
+                  <div className="flex items-center justify-between p-3 sm:p-3.5 hover:bg-muted/40 transition-colors">
+                    <div className="flex items-center gap-2.5">
+                      <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                        <Building2 className="w-4 h-4 text-primary" />
                       </div>
                       <div>
-                        <p className="font-bold text-slate-900">{branch.name}</p>
-                        <p className="text-xs text-slate-500">
+                        <p className="font-bold text-foreground text-sm leading-tight">{branch.name}</p>
+                        <p className="text-[11px] text-muted-foreground">
                           {branchExamCount} exam{branchExamCount !== 1 ? "s" : ""}
                           {branchCompleted > 0 && <span className="ml-2 text-emerald-600 font-semibold">· {branchCompleted} completed</span>}
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2.5">
                       {/* Mini status pills */}
                       <div className="hidden sm:flex gap-1.5">
                         {["scheduled","ongoing","completed"].map(st => {
@@ -301,8 +354,8 @@ export default function SuperAdminExamsPage() {
                         })}
                       </div>
                       {isOpen
-                        ? <ChevronDown className="w-4 h-4 text-slate-400" />
-                        : <ChevronRight className="w-4 h-4 text-slate-400" />
+                        ? <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                        : <ChevronRight className="w-4 h-4 text-muted-foreground" />
                       }
                     </div>
                   </div>
@@ -310,21 +363,21 @@ export default function SuperAdminExamsPage() {
 
                 {/* Exams Table (expanded) */}
                 {isOpen && (
-                  <div className="border-t">
+                  <div className="border-t border-border">
                     <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
+                      <table className="w-full text-xs">
                         <thead>
-                          <tr className="bg-slate-50 border-b">
-                            <th className="text-left px-4 py-3 font-bold text-slate-600 text-xs uppercase tracking-wide">Exam</th>
-                            <th className="text-left px-4 py-3 font-bold text-slate-600 text-xs uppercase tracking-wide">Class / Section</th>
-                            <th className="text-center px-4 py-3 font-bold text-slate-600 text-xs uppercase tracking-wide">Subjects</th>
-                            <th className="text-center px-4 py-3 font-bold text-slate-600 text-xs uppercase tracking-wide">Students</th>
-                            <th className="text-center px-4 py-3 font-bold text-slate-600 text-xs uppercase tracking-wide">Performance</th>
-                            <th className="text-center px-4 py-3 font-bold text-slate-600 text-xs uppercase tracking-wide">Status</th>
-                            <th className="text-right px-4 py-3 font-bold text-slate-600 text-xs uppercase tracking-wide">Actions</th>
+                          <tr className="bg-muted/30 border-b border-border">
+                            <th className="text-left px-3.5 py-2.5 font-bold text-muted-foreground uppercase tracking-wide">Exam</th>
+                            <th className="text-left px-3.5 py-2.5 font-bold text-muted-foreground uppercase tracking-wide">Class / Section</th>
+                            <th className="text-center px-3.5 py-2.5 font-bold text-muted-foreground uppercase tracking-wide">Subjects</th>
+                            <th className="text-center px-3.5 py-2.5 font-bold text-muted-foreground uppercase tracking-wide">Students</th>
+                            <th className="text-center px-3.5 py-2.5 font-bold text-muted-foreground uppercase tracking-wide">Performance</th>
+                            <th className="text-center px-3.5 py-2.5 font-bold text-muted-foreground uppercase tracking-wide">Status</th>
+                            <th className="text-right px-3.5 py-2.5 font-bold text-muted-foreground uppercase tracking-wide">Actions</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-border">
                           {branch.exams.map(exam => {
                             const eid  = exam.id;
                             const perf = getExamPerf(exam);

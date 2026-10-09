@@ -16,14 +16,15 @@ import StaffAttendanceHistoryModal from './StaffAttendanceHistoryModal';
 
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import StatsCard from '@/components/dashboard/StatsCard';
 
 const STATUS_CONFIG = {
-    PRESENT: { label: 'Present', color: 'bg-green-100 text-green-700 border-green-200', icon: CheckCircle },
-    ABSENT: { label: 'Absent', color: 'bg-red-100 text-red-700 border-red-200', icon: XCircle },
-    LATE: { label: 'Late', color: 'bg-yellow-100 text-yellow-700 border-yellow-200', icon: Clock },
-    LEAVE: { label: 'Leave', color: 'bg-blue-100 text-blue-700 border-blue-200', icon: AlertCircle },
-    HALF_DAY: { label: 'Half Day', color: 'bg-purple-100 text-purple-700 border-purple-200', icon: Clock },
-    HOLIDAY: { label: 'Holiday', color: 'bg-gray-100 text-gray-700 border-gray-200', icon: Calendar }
+    PRESENT: { label: 'Present', color: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/40', icon: CheckCircle },
+    ABSENT: { label: 'Absent', color: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800/40', icon: XCircle },
+    LATE: { label: 'Late', color: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800/40', icon: Clock },
+    LEAVE: { label: 'Leave', color: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800/40', icon: AlertCircle },
+    HALF_DAY: { label: 'Half Day', color: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-400 dark:border-purple-800/40', icon: Clock },
+    HOLIDAY: { label: 'Holiday', color: 'bg-secondary text-secondary-foreground border-border', icon: Calendar }
 };
 
 
@@ -296,60 +297,44 @@ export default function StaffAttendanceManager({ isBranchAdmin = false, defaultB
     if (!mounted) return null;
 
     return (
-        <div className="space-y-5">
+        <div className="space-y-4">
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card className="bg-white border-blue-100 ring-1 ring-blue-50">
-                    <CardContent className="p-4 flex items-center gap-4">
-                        <div className="p-3 bg-blue-100 rounded-xl text-blue-600">
-                            <Users className="h-6 w-6" />
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-gray-500">Total Records</p>
-                            <h3 className="text-2xl font-bold text-gray-900">{attendanceRecords.length}</h3>
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card className="bg-white border-green-100 ring-1 ring-green-50">
-                    <CardContent className="p-4 flex items-center gap-4">
-                        <div className="p-3 bg-green-100 rounded-xl text-green-600">
-                            <CheckCircle className="h-6 w-6" />
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-gray-500">Present</p>
-                            <h3 className="text-2xl font-bold text-gray-900">{reportSummary?.present || 0}</h3>
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card className="bg-white border-red-100 ring-1 ring-red-50">
-                    <CardContent className="p-4 flex items-center gap-4">
-                        <div className="p-3 bg-red-100 rounded-xl text-red-600">
-                            <XCircle className="h-6 w-6" />
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-gray-500">Absent</p>
-                            <h3 className="text-2xl font-bold text-gray-900">{reportSummary?.absent || 0}</h3>
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card className="bg-white border-yellow-100 ring-1 ring-yellow-50">
-                    <CardContent className="p-4 flex items-center gap-4">
-                        <div className="p-3 bg-yellow-100 rounded-xl text-yellow-600">
-                            <Clock className="h-6 w-6" />
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-gray-500">Late / Leave</p>
-                            <h3 className="text-2xl font-bold text-gray-900">{(reportSummary?.late || 0) + (reportSummary?.leave || 0)}</h3>
-                        </div>
-                    </CardContent>
-                </Card>
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5">
+                <StatsCard 
+                    title="Total Records"
+                    value={attendanceRecords.length.toString()}
+                    icon={Users}
+                    description="Current filter selection"
+                    color="blue"
+                />
+                <StatsCard 
+                    title="Present Today"
+                    value={(reportSummary?.present || 0).toString()}
+                    icon={CheckCircle}
+                    description="Faculty and staff on duty"
+                    color="green"
+                />
+                <StatsCard 
+                    title="Absent"
+                    value={(reportSummary?.absent || 0).toString()}
+                    icon={XCircle}
+                    description="Reported absent records"
+                    color="red"
+                />
+                <StatsCard 
+                    title="Late / Leave"
+                    value={((reportSummary?.late || 0) + (reportSummary?.leave || 0)).toString()}
+                    icon={Clock}
+                    description={`${reportSummary?.late || 0} Late • ${reportSummary?.leave || 0} Leave`}
+                    color="yellow"
+                />
             </div>
 
             {/* ── Controls Bar ─────────────────────────────────────────────── */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+            <div className="bg-card rounded-xl border border-border shadow-xs overflow-hidden">
 
                 {/* ── Top Row: Filters ── */}
-                <div className="flex flex-wrap items-end gap-3 px-5 pt-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex flex-wrap items-end gap-3 p-3.5 sm:p-4 border-b border-border/50">
 
                     {/* Date */}
                     <div className="flex flex-col gap-1 min-w-0">
@@ -471,54 +456,58 @@ export default function StaffAttendanceManager({ isBranchAdmin = false, defaultB
             </div>
 
             {/* ── Attendance Table ── */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+            <Card className="border border-border bg-card shadow-xs overflow-hidden">
 
                 {/* Table header bar */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+                <CardHeader className="p-3.5 sm:p-4 pb-2 border-b border-border/50 flex flex-row items-center justify-between">
                     <div>
-                        <h3 className="text-sm font-black text-slate-700 dark:text-slate-200 uppercase tracking-wider">Attendance Records</h3>
-                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+                        <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                                <Briefcase className="w-3.5 h-3.5" />
+                            </div>
+                            Staff Attendance Records
+                        </CardTitle>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
                             {filteredRecords.length} {filteredRecords.length === 1 ? 'record' : 'records'} found
                         </p>
                     </div>
                     {filters.searchQuery && (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 text-xs font-bold rounded-full border border-violet-200 dark:border-violet-800">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-secondary text-secondary-foreground text-xs font-semibold rounded-full border border-border">
                             <Search className="h-3 w-3" />
                             Filtering: &quot;{filters.searchQuery}&quot;
                         </span>
                     )}
-                </div>
+                </CardHeader>
 
-                <div className="overflow-x-auto min-h-[420px]">
-                    {loading ? (
-                        <div className="flex flex-col items-center justify-center h-[420px] gap-4">
-                            <div className="relative">
-                                <div className="h-12 w-12 rounded-full border-4 border-violet-100 dark:border-violet-900" />
-                                <div className="absolute inset-0 h-12 w-12 rounded-full border-4 border-violet-600 border-t-transparent animate-spin" />
+                <CardContent className="p-0">
+                    <div className="overflow-x-auto min-h-[420px]">
+                        {loading ? (
+                            <div className="flex flex-col items-center justify-center h-[420px] gap-4">
+                                <div className="relative">
+                                    <div className="h-10 w-10 rounded-full border-4 border-primary/20" />
+                                    <div className="absolute inset-0 h-10 w-10 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+                                </div>
+                                <p className="text-xs font-medium text-muted-foreground">Loading records…</p>
                             </div>
-                            <p className="text-sm font-semibold text-slate-400 dark:text-slate-500">Loading records…</p>
-                        </div>
-                    ) : filteredRecords.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-[420px] gap-3">
-                            <div className="p-5 bg-slate-100 dark:bg-slate-800 rounded-full">
-                                <Calendar className="h-10 w-10 text-slate-300 dark:text-slate-600" />
+                        ) : filteredRecords.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center h-[420px] gap-2 text-center p-6">
+                                <Calendar className="h-10 w-10 text-muted-foreground opacity-30" />
+                                <p className="text-xs font-semibold text-foreground">No Records Found</p>
+                                <p className="text-[11px] text-muted-foreground">No attendance records match your current filters.</p>
                             </div>
-                            <p className="text-base font-bold text-slate-500 dark:text-slate-400">No Records Found</p>
-                            <p className="text-sm text-slate-400 dark:text-slate-500">No attendance records match your current filters.</p>
-                        </div>
-                    ) : (
-                        <table className="w-full text-sm">
-                            <thead>
-                                <tr className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-700/60">
-                                    <th className="px-6 py-3.5 text-left text-[11px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Staff Member</th>
-                                    <th className="px-6 py-3.5 text-left text-[11px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Role</th>
-                                    <th className="px-6 py-3.5 text-center text-[11px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Date</th>
-                                    <th className="px-6 py-3.5 text-center text-[11px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Status</th>
-                                    <th className="px-6 py-3.5 text-center text-[11px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Check-In</th>
-                                    <th className="px-6 py-3.5 text-center text-[11px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Check-Out</th>
-                                    <th className="px-6 py-3.5 text-right text-[11px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Actions</th>
-                                </tr>
-                            </thead>
+                        ) : (
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="bg-muted/40 border-b border-border/50">
+                                        <th className="px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Staff Member</th>
+                                        <th className="px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Role</th>
+                                        <th className="px-4 py-2.5 text-center text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Date</th>
+                                        <th className="px-4 py-2.5 text-center text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Status</th>
+                                        <th className="px-4 py-2.5 text-center text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Check-In</th>
+                                        <th className="px-4 py-2.5 text-center text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Check-Out</th>
+                                        <th className="px-4 py-2.5 text-right text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Actions</th>
+                                    </tr>
+                                </thead>
                             <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
                                 {filteredRecords.map((record, idx) => {
                                     const status = record.status;
@@ -615,8 +604,9 @@ export default function StaffAttendanceManager({ isBranchAdmin = false, defaultB
                             </tbody>
                         </table>
                     )}
-                </div>
-            </div>
+                    </div>
+                </CardContent>
+            </Card>
 
             {/* Attendance Modal */}
             {isModalOpen && (

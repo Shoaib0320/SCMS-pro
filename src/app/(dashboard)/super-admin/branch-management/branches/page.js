@@ -32,6 +32,8 @@ import BranchCard from '@/components/branch/BranchCard';
 import BranchViewModal from '@/components/branch/BranchViewModal';
 import BranchFormModal from '@/components/branch/BranchFormModal';
 import ConfirmDeleteModal from '@/components/modals/ConfirmDeleteModal';
+import StatsCard from '@/components/dashboard/StatsCard';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
 
 import { withAuth } from '@/hooks/useAuth';
 import { ROLES } from '@/constants/roles';
@@ -249,125 +251,127 @@ function BranchesPage() {
 
   if (loading && branches.length === 0) {
     return (
-      <div className="p-4 md:p-6">
+      <div className="space-y-4">
         <BranchManagementSkeleton />
       </div>
     );
   }
 
   return (
-    <div className="p-4 md:p-6 space-y-4 md:space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex-1 pt-8">
-          <h1 className="text-xl md:text-2xl font-bold text-gray-900">Branch Management</h1>
-          <p className="text-sm text-gray-600 mt-1">Manage all coaching branches and locations</p>
-        </div>
+      <DashboardHeader
+        title="Branch Management"
+        subtitle="Manage all coaching branches, campuses, and operational units"
+        onRefresh={loadBranches}
+      >
         {branches.length < 3 ? (
           <Button
             onClick={handleAddNew}
+            size="sm"
+            className="h-8 px-3 text-xs font-semibold rounded-lg bg-primary hover:bg-primary-hover text-primary-foreground transition-colors cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-3.5 h-3.5 mr-1" />
             Add Branch
           </Button>
         ) : (
-          <div className="flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-2 rounded-lg border border-amber-200 text-sm font-medium">
-            <Building2 className="w-4 h-4" />
-            Branch creation limit reached (Max 3)
+          <div className="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 px-2.5 py-1 rounded-lg border border-amber-200 dark:border-amber-800/40 text-xs font-semibold">
+            <Building2 className="w-3.5 h-3.5" />
+            <span>Limit reached (Max 3)</span>
           </div>
         )}
+      </DashboardHeader>
+
+      {/* Stats Cards (Compact 4-column Grid matching Dashboard Overview) */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5">
+        <StatsCard 
+          title="Total Branches"
+          value={branches.length}
+          icon={Building2}
+          description={`${branches.filter(b => b.is_active).length} Active • ${branches.filter(b => !b.is_active).length} Inactive`}
+          color="blue"
+        />
+        <StatsCard 
+          title="Total Students"
+          value={totalStudents}
+          icon={GraduationCap}
+          description="Enrolled across branches"
+          color="green"
+        />
+        <StatsCard 
+          title="Total Teachers"
+          value={totalTeachers}
+          icon={UserCheck}
+          description="Active faculty members"
+          color="purple"
+        />
+        <StatsCard 
+          title="Total Staff"
+          value={totalStaff}
+          icon={Users}
+          description="Support & admin personnel"
+          color="orange"
+        />
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        <div className="bg-white p-4 md:p-6 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs md:text-sm text-gray-600">Total Branches</p>
-              <p className="text-xl md:text-2xl font-bold text-gray-900 mt-1">{branches.length}</p>
-            </div>
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Building2 className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-4 md:p-6 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs md:text-sm text-gray-600">Total Students</p>
-              <p className="text-xl md:text-2xl font-bold text-gray-900 mt-1">{totalStudents}</p>
-            </div>
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <GraduationCap className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-4 md:p-6 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs md:text-sm text-gray-600">Total Teachers</p>
-              <p className="text-xl md:text-2xl font-bold text-gray-900 mt-1">{totalTeachers}</p>
-            </div>
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <UserCheck className="w-5 h-5 md:w-6 md:h-6 text-purple-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-4 md:p-6 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs md:text-sm text-gray-600">Total Staff</p>
-              <p className="text-xl md:text-2xl font-bold text-gray-900 mt-1">{totalStaff}</p>
-            </div>
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Users className="w-5 h-5 md:w-6 md:h-6 text-orange-600" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="bg-white p-4 rounded-lg border border-gray-200">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="min-w-0">
-            <Input
+      {/* Compact Filters & Search Toolbar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 p-2.5 rounded-xl border border-border bg-card shadow-xs">
+        <div className="flex flex-1 items-center gap-2 max-w-md">
+          <div className="relative flex-1">
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search branches..."
+              placeholder="Search branches by name, city, code..."
+              className="w-full h-8 pl-8 pr-3 text-xs rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors"
             />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
           </div>
 
-          <Dropdown
+          <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            options={[
-              { value: '', label: 'All Status' },
-              { value: 'active', label: 'Active' },
-              { value: 'inactive', label: 'Inactive' },
-            ]}
-            placeholder={null}
-          />
+            className="h-8 px-2.5 text-xs rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer min-w-[110px]"
+          >
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+
+        <div className="text-right flex items-center justify-between sm:justify-end gap-2">
+          <span className="text-[11px] font-medium text-muted-foreground">
+            {branches.length} {branches.length === 1 ? 'branch' : 'branches'} found
+          </span>
         </div>
       </div>
 
       {/* Branches Grid */}
-      <div className="min-h-[400px]">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="min-h-[300px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
           {branches.length === 0 ? (
-            <div className="col-span-full bg-white p-12 rounded-lg border border-gray-200 text-center">
-              <Building2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">No branches found. Create your first branch to get started.</p>
+            <div className="col-span-full p-10 rounded-xl border border-dashed border-border bg-card/60 text-center">
+              <Building2 className="w-12 h-12 text-muted-foreground/60 mx-auto mb-3" />
+              <p className="text-sm font-semibold text-foreground">No branches found</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {searchTerm || statusFilter ? 'Try clearing your filters or search term' : 'Create your first branch to get started'}
+              </p>
             </div>
           ) : (
             <>
               {loading && branches.length > 0 && (
-                <div className="col-span-full mb-4">
-                  <div className="flex items-center gap-2 text-blue-600 animate-pulse bg-blue-50 w-max px-4 py-1.5 rounded-full border border-blue-100 shadow-sm">
-                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
-                    <span className="text-xs font-semibold uppercase tracking-wider">Refreshing Branches...</span>
+                <div className="col-span-full mb-1">
+                  <div className="flex items-center gap-1.5 text-primary text-xs font-semibold">
+                    <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
+                    <span>Updating branches...</span>
                   </div>
                 </div>
               )}
